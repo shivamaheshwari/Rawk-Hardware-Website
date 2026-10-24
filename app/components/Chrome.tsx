@@ -55,7 +55,7 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 lg:hidden">
+  return (<div className="sticky bottom-0 z-40 flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 lg:hidden">
     <a href={whatsappUrl(message)} target="_blank" rel="noreferrer" className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-wa text-sm font-semibold text-white">{isProduct ? "Enquire about this product" : "WhatsApp"}</a>
     <Link to="/bulk-orders" className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-navy text-sm font-semibold text-white">Bulk Quote</Link>
   </div>);
@@ -63,8 +63,8 @@ export function MobileBar() {
 export default function Layout() {
   const [message, setMessage] = useState("Hello, I would like to enquire about RAWK hardware products.");
   return (<EnquiryContext.Provider value={{ message, setMessage }}>
-    <div className="min-h-screen overflow-x-clip pb-24 lg:pb-0">
-      <Header /><main><Outlet /></main><Footer /><MobileBar />
+    <div className="min-h-screen overflow-x-clip lg:pb-0">
+      <Header /><main><Outlet /><MobileBar /></main><Footer />
     </div>
   </EnquiryContext.Provider>);
 }
