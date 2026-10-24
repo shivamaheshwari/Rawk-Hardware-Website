@@ -1,0 +1,7 @@
+node_modules/
+build/
+.dev/
+data/leads.jsonl
+.env
+.react-router/
+tsconfig.tsbuildinfo
