@@ -72,6 +72,23 @@ const FAQS = [
   { q: "How do I enquire for a bulk or project order?", a: "Go to the Bulk Orders page and share product codes, quantities and your city. The shop will confirm availability and share a tailored quote." },
 ];
 
+// FAQ item (user request 2026-10-26): the toggle uses the project's own
+// plus/minus SVGs properly — plus when closed, minus when open — instead
+// of rotating the plus into a cross. Padding is roomier (see the section
+// below) so the questions no longer feel stuck together.
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <details className="faq-item border-b border-line last:border-0" onToggle={(e) => setOpen(e.currentTarget.open)}>
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 font-bold text-navy">
+        {q}
+        <img key={open ? "minus" : "plus"} src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={16} height={16} className="h-4 w-4 shrink-0" />
+      </summary>
+      <p className="pb-5 leading-relaxed text-body">{a}</p>
+    </details>
+  );
+}
+
 function HeroSlide({ slide, isFirst }: { slide: (typeof HERO_SLIDES)[number]; isFirst: boolean }) {
   const p = PRODUCTS.find((x) => x.slug === slide.slug)!;
   const Heading = isFirst ? "h1" : "p";
@@ -275,15 +292,9 @@ export default function Home() {
 
     {/* 7 — FAQs */}
     <Section id="faqs" eyebrow="FAQs" title="Frequently Asked Questions" sub="Answers about ordering from Vinayak Enterprises (RAWK) — products, bulk orders and the shop.">
-      <div className="rounded border border-line bg-white px-5">
+      <div className="rounded border border-line bg-white px-5 py-2 sm:px-6">
         {FAQS.map((f) => (
-          <details key={f.q} className="faq-item border-b border-line last:border-0">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 font-bold text-navy">
-              {f.q}
-              <img src="/icons/plus.svg" alt="" aria-hidden="true" width={16} height={16} className="faq-toggle h-4 w-4 shrink-0" />
-            </summary>
-            <p className="pb-4 leading-relaxed text-body">{f.a}</p>
-          </details>
+          <FaqItem key={f.q} q={f.q} a={f.a} />
         ))}
       </div>
     </Section>

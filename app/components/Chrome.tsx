@@ -34,7 +34,7 @@ function FooterWordmark() {
   const [stage, setStage] = useState(0);
   if (stage === 2) return <p className="font-serif text-3xl font-bold">RAWK</p>;
   const src = stage === 0 ? "/images/rawk-logo-white.png" : LOGO_WHITE;
-  return <img src={src} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setStage((v) => v + 1)} />;
+  return <img src={src} alt="RAWK" width={100} height={50} className="h-[50px] w-auto" onError={() => setStage((v) => v + 1)} />;
 }
 
 // Mega menu groups as specified by the user (2026-10-25). No group shows
@@ -208,14 +208,28 @@ export function Header() {
   </>);
 }
 
+// Footer link groups (user request 2026-10-26): on mobile they stay
+// COLLAPSED until tapped, and the toggle uses the project's own
+// plus/minus SVGs properly — plus when closed, minus when open. The
+// SVGs are black strokes, so they are inverted to white on this dark
+// footer. On desktop (lg+) the groups are always shown and the icon
+// is hidden; resizing across the breakpoint re-syncs the state.
 function FooterGroup({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(() => typeof window !== "undefined" ? window.matchMedia("(min-width: 1024px)").matches : true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setOpen(mq.matches);
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
   return (
-    <details open className="footer-group border-b border-white/15 py-2 lg:border-0 lg:py-0">
-      <summary className="flex cursor-pointer list-none items-center justify-between font-semibold lg:cursor-default">
-        {title}<span aria-hidden className="footer-chevron lg:hidden">▾</span>
-      </summary>
-      <div className="mt-2">{children}</div>
-    </details>
+    <div className="border-b border-white/15 py-2 lg:border-0 lg:py-0">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex w-full cursor-pointer items-center justify-between font-semibold lg:cursor-default">
+        {title}
+        <img key={open ? "minus" : "plus"} src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5 shrink-0 invert lg:hidden" />
+      </button>
+      <div className={open ? "mt-2" : "mt-2 hidden lg:block"}>{children}</div>
+    </div>
   );
 }
 
@@ -263,7 +277,7 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 sm:px-[30px] sm:py-5 lg:hidden">
+  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white p-4 sm:p-4 lg:px-[20px] lg:py-[30px] lg:hidden">
     <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
     <RawkButton to="/bulk-orders" className="flex-1">Bulk Quote</RawkButton>
   </div>);

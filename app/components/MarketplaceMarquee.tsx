@@ -67,7 +67,7 @@ export default function MarketplaceMarquee() {
           label="Marketplace logos"
           perView={{ mobile: 3, tablet: 4, desktop: 6 }}
           slidesPerGroup={1}
-          spaceBetween={40}
+          spaceBetween={64}
           autoplay
           autoplayMs={0}
           speed={1500}

@@ -33,17 +33,8 @@ input[type="search"]:focus-visible, #drawer-search:focus-visible { outline: none
   .rawk-marquee-track { animation: none; flex-wrap: wrap; }
 }
 
-/* Footer link groups: open by default on all widths (user request
-   2026-10-26 — items must not hide inside closed accordions); tapping a
-   heading on mobile can still collapse its group. */
-.footer-group summary::-webkit-details-marker { display: none; }
-.footer-group summary::marker { content: ""; }
-@media (min-width: 1024px) {
-  .footer-group > div { display: block !important; }
-  .footer-group summary { cursor: default; }
-  .footer-group summary::-webkit-details-marker { display: none; }
-  .footer-group summary .footer-chevron { display: none; }
-}
+/* Footer link groups are now stateful buttons in Chrome.tsx (collapsed
+   on mobile, always shown on desktop) — no <details> CSS is needed. */
 
 /* Swiper pagination (best sellers): dots below the slider, one per page. */
 .swiper { overflow: hidden; }
@@ -76,8 +67,7 @@ input[type="search"]:focus-visible, #drawer-search:focus-visible { outline: none
 .hero-swiper .swiper-slide { height: auto; display: flex; }
 .hero-swiper .swiper-slide > div { flex: 1 1 auto; width: 100%; }
 
-/* FAQ accordion: plus icon turns into a cross when open. */
+/* FAQ accordion: the toggle icon swaps plus/minus via state in
+   home.tsx (FaqItem) — no rotation trick. */
 .faq-item summary { list-style: none; }
 .faq-item summary::-webkit-details-marker { display: none; }
-.faq-item .faq-toggle { transition: transform 0.3s ease; }
-.faq-item[open ] .faq-toggle { transform: rotate(45deg); }
