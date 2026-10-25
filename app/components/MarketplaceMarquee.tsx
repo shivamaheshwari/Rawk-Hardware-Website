@@ -44,10 +44,10 @@ function LogoImage({ name }: { name: string }) {
     <img
       src={src}
       alt={label}
-      width={180}
-      height={48}
+      width={220}
+      height={64}
       loading="lazy"
-      className="h-12 w-auto max-w-[180px] object-contain"
+      className="h-16 w-auto max-w-[220px] object-contain"
       onError={() => setStage((s) => s + 1)}
     />
   );
@@ -64,6 +64,7 @@ export default function MarketplaceMarquee() {
         <RawkSwiper
           label="Marketplace logos"
           perView={{ mobile: 3, tablet: 4, desktop: 6 }}
+          slidesPerGroup={1}
           spaceBetween={40}
           autoplay
           autoplayMs={2000}
@@ -75,7 +76,7 @@ export default function MarketplaceMarquee() {
         >
           {MARKETPLACES.map((m) => {
             const content = (
-              <span className="flex min-h-12 items-center justify-center whitespace-nowrap text-navy">
+              <span className="flex min-h-16 items-center justify-center whitespace-nowrap text-navy">
                 <LogoImage name={m.name} />
               </span>
             );

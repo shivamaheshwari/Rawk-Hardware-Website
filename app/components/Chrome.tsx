@@ -23,7 +23,7 @@ function LogoImg({ local, drive, alt }: { local: string; drive: string; alt: str
   const [stage, setStage] = useState(0);
   if (stage === 2) return <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>;
   const src = stage === 0 ? local : drive;
-  return <img src={src} alt={alt} className="aspect-[2/1] max-h-[70px] w-auto object-contain" onError={() => setStage((v) => v + 1)} />;
+  return <img src={src} alt={alt} className="aspect-[2/1] w-[70px] object-contain" onError={() => setStage((v) => v + 1)} />;
 }
 function Wordmark() {
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
@@ -85,10 +85,10 @@ export function Header() {
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
       Hardware for every detail of your home.
     </div>
-    <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-[30px] lg:px-12">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-[30px] lg:px-6 xl:px-12">
       <Wordmark />
       <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><img src="/icons/menu-alt-1.svg" alt="" aria-hidden="true" width={22} height={22} className="h-[22px] w-[22px]" /> Menu</button>
-      <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
+      <nav aria-label="Primary" className="hidden items-center gap-3 lg:flex xl:gap-6">
         <div>
           <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onMouseEnter={() => setMegaOpen(true)} onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
             Collections <img src={megaOpen ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
@@ -101,17 +101,17 @@ export function Header() {
       <div className="order-3 hidden w-full lg:order-none lg:ml-auto lg:block lg:w-auto">
         <Form method="get" action="/products" role="search" className="flex">
           <label htmlFor="site-search" className="sr-only">Search products</label>
-          <input id="site-search" name="q" type="search" placeholder="Search handles, locks, hinges…" className="min-h-11 w-full min-w-0 rounded-l border border-line bg-white px-3 text-[15px] lg:w-64" />
+          <input id="site-search" name="q" type="search" placeholder="Search handles, locks, hinges…" className="min-h-11 w-full min-w-0 rounded-l border border-line bg-white px-3 text-[15px] lg:w-36 xl:w-64" />
           <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#33312e]">Search</RawkButton>
         </Form>
       </div>
-      <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full bg-navy px-5 text-sm font-bold text-white transition-colors duration-300 hover:bg-[#33312e] lg:inline-flex">Buy From Amazon</RawkButton>
-      <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy px-5 text-sm font-bold text-navy transition-colors duration-300 hover:bg-navy hover:text-white lg:inline-flex">Contact Us</RawkButton>
+      <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full bg-navy px-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-[#33312e] lg:inline-flex xl:px-5">Buy From Amazon</RawkButton>
+      <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy px-3 text-sm font-bold text-navy transition-colors duration-300 hover:bg-navy hover:text-white lg:inline-flex xl:px-5">Contact Us</RawkButton>
     </div>
     {megaOpen && (
       <div className="mega-menu absolute left-0 right-0 top-full z-50 hidden overflow-hidden border-b border-line bg-white shadow-xl lg:block" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
         <div aria-hidden className="pointer-events-none absolute right-0 top-0 h-[130px] w-[320px] rounded-bl-full bg-brass" />
-        <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-[auto_auto_auto_auto_280px] gap-10 px-12 pb-10 pt-10">
+        <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-[auto_auto_auto_auto_280px] gap-6 px-6 pb-10 pt-10 xl:gap-10 xl:px-12">
           <div>
             <Link to="/products" prefetch="intent" onClick={() => setMegaOpen(false)} className="text-base font-bold uppercase tracking-wide text-navy hover:text-brass">Shop All Products</Link>
           </div>

@@ -203,7 +203,7 @@ export default function Home() {
         arrows removed, page dots only) + tablet/mobile grid with Load More. */}
     <Section id="best-sellers" eyebrow="Best Sellers" title="Our Best Sellers" action={<RawkButton to="/products" variant="secondary">View all products</RawkButton>}>
       <div className="hidden lg:block">
-        <RawkSwiper label="Best sellers" perView={{ mobile: 4, tablet: 4, desktop: 4 }} spaceBetween={16} autoplay autoplayMs={1000} speed={1000} loop usePagination showArrows={false} showDots={false}>
+        <RawkSwiper label="Best sellers" perView={{ mobile: 4, tablet: 4, desktop: 4 }} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false}>
           {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
         </RawkSwiper>
       </div>
@@ -220,17 +220,17 @@ export default function Home() {
     </Section>
 
     {/* 5 — Bulk-order banner */}
-    <section className="mx-auto w-full max-w-[1440px] px-0 sm:px-[30px] lg:px-12">
-      <div className="grid overflow-hidden rounded-none bg-[#1d1c19] text-white sm:rounded lg:grid-cols-2">
-        <div className="px-6 py-10 sm:px-10 lg:py-14">
+    <section className="w-full">
+      <div className="grid overflow-hidden bg-[#1d1c19] text-white lg:grid-cols-2">
+        <div className="flex flex-col justify-center px-6 py-10 sm:px-10 lg:py-14">
           <h2 className="font-serif text-3xl leading-tight sm:text-4xl">Big projects. Better partnerships.</h2>
           <p className="mt-3 max-w-md text-white/80">For dealers, retailers and project requirements.</p>
           <div className="mt-6">
-            <RawkButton to="/bulk-orders" variant="onDark" arrow>Enquire for Bulk Orders</RawkButton>
+            <RawkButton to="/bulk-orders" variant="custom" arrow className="inline-flex min-h-11 items-center justify-center gap-2 rounded border border-transparent bg-white px-5 text-sm font-bold text-navy transition-all duration-300 hover:border-white hover:bg-transparent hover:text-white">Enquire for Bulk Orders</RawkButton>
           </div>
         </div>
-        <div className="group relative min-h-[240px] overflow-hidden">
-          <img src={bulkImage.images[0].src} alt={bulkImage.images[0].alt} width={800} height={600} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transform-none" />
+        <div className="relative min-h-[310px] overflow-hidden lg:min-h-[340px]">
+          <img src={bulkImage.images[0].src} alt={bulkImage.images[0].alt} width={800} height={600} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
         </div>
       </div>
     </section>

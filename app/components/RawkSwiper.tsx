@@ -22,6 +22,8 @@ export type RawkSwiperProps = {
   label: string;
   children: ReactNode;
   perView?: { mobile: number; tablet: number; desktop: number };
+  slidesPerGroup?: number;
+  /** Advance this many slides per autoplay step; defaults to perView. */
   spaceBetween?: number;
   autoplay?: boolean;
   autoplayMs?: number;
@@ -46,6 +48,7 @@ export default function RawkSwiper({
   label,
   children,
   perView = { mobile: 1, tablet: 2, desktop: 4 },
+  slidesPerGroup,
   spaceBetween = 16,
   autoplay = false,
   autoplayMs = 6000,
@@ -140,10 +143,10 @@ export default function RawkSwiper({
         loop={loop}
         spaceBetween={spaceBetween}
         slidesPerView={perView.mobile}
-        slidesPerGroup={perView.mobile}
+        slidesPerGroup={slidesPerGroup ?? perView.mobile}
         breakpoints={{
-          768: { slidesPerView: perView.tablet, slidesPerGroup: perView.tablet },
-          1024: { slidesPerView: perView.desktop, slidesPerGroup: perView.desktop },
+          768: { slidesPerView: perView.tablet, slidesPerGroup: slidesPerGroup ?? perView.tablet },
+          1024: { slidesPerView: perView.desktop, slidesPerGroup: slidesPerGroup ?? perView.desktop },
         }}
         onSwiper={handleSwiper}
         onSlideChange={handleChange}
