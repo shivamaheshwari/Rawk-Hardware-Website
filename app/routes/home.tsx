@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, type MetaFunction } from "react-router";
 import type { Swiper as SwiperType } from "swiper";
 import { PRODUCTS, type Product } from "../data/products";
-import { BUSINESS, whatsappUrl } from "../lib/site";
+import { BUSINESS } from "../lib/site";
 import { canonical, orgJsonLd, breadcrumbJsonLd } from "../lib/seo";
 import { ProductImage } from "../components/ProductCard";
 import RawkSwiper from "../components/RawkSwiper";
@@ -323,7 +323,13 @@ export default function Home() {
             Instagram: <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">{BUSINESS.instagram}</a>
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <RawkButton variant="whatsapp" href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" rel="noreferrer">Enquire on WhatsApp</RawkButton>
+            {/* Map section (user request 2026-10-26): the green WhatsApp
+                button is removed here; in its place is a Call Us button
+                with a phone icon, dialling the shop's first number. */}
+            <RawkButton href={`tel:${BUSINESS.phones[0]}`}>
+              <img src="/icons/phone.svg" alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 shrink-0" />
+              Call Us
+            </RawkButton>
             <RawkButton variant="secondary" href="https://www.google.com/maps/search/?api=1&query=26.201308590301593,78.15121357487061" target="_blank" rel="noreferrer">Get Directions</RawkButton>
           </div>
         </div>
