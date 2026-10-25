@@ -55,6 +55,23 @@ const SAMPLE_TESTIMONIALS = [
   { quote: "Professional service and beautiful products. We'll definitely be ordering again for our next project.", name: "Customer name" },
 ];
 
+// FAQs (2026-10-25, user-supplied): 8 questions. The shop name
+// "Vinayak Enterprises" appears once, in the section intro below; answers
+// use RAWK / the shop after that. Minimum bulk order Rs 2,000 and the
+// direct-purchase condition (packing video first, then payment) are the
+// user's own terms. No other price, link or promise is invented here:
+// Flipkart has no verified store link, so that answer routes to WhatsApp.
+const FAQS = [
+  { q: "What products does RAWK sell?", a: "Handles, knobs, locks, hinges, drain jali and drain pipes for doors, kitchens, bathrooms and wardrobes." },
+  { q: "How can I contact you?", a: "Tap the WhatsApp Enquiry button anywhere on this site, call the shop, or use the Contact page. You can also find RAWK on Instagram at @rawk_04." },
+  { q: "Can I buy from Amazon or Flipkart?", a: "Yes, on Amazon — our D2 Cabinet Handle (Rose Gold Black, 6-inch) is listed on Amazon India; use the Buy From Amazon button in the header. For Flipkart, message us on WhatsApp and we will share the correct listing link." },
+  { q: "What is the minimum bulk order?", a: "Rs 2,000. For larger or project requirements, share product codes, quantities and your city on the Bulk Orders page." },
+  { q: "How does direct purchase work?", a: "For a direct purchase, we will send you a video of your order being packed, and then you can send us the payment." },
+  { q: "Where is your shop?", a: "Opposite UCO Bank, Daulatganj, Lashkar, Gwalior 474001. Call 9589133387 or 8962636662." },
+  { q: "Why are some products marked Preview?", a: "Some catalogue items are marked Preview because their specifications are still to be confirmed from the catalogue sheet. Please ask the shop on WhatsApp to confirm the details before ordering." },
+  { q: "How do I enquire for a bulk or project order?", a: "Go to the Bulk Orders page and share product codes, quantities and your city. The shop will confirm availability and share a tailored quote." },
+];
+
 function HeroSlide({ slide, isFirst }: { slide: (typeof HERO_SLIDES)[number]; isFirst: boolean }) {
   const p = PRODUCTS.find((x) => x.slug === slide.slug)!;
   const Heading = isFirst ? "h1" : "p";
@@ -237,7 +254,7 @@ export default function Home() {
 
     {/* 6 — Testimonials (samples, explicitly labelled — see comment above) */}
     <Section eyebrow="Testimonials" title="What Our Customers Say" sub="Sample testimonials for UI review only — not real customer reviews. Replace with genuine reviews before release.">
-      <RawkSwiper label="Testimonials" perView={{ mobile: 1, tablet: 2, desktop: 3 }} spaceBetween={16}>
+      <RawkSwiper label="Testimonials" perView={{ mobile: 1, tablet: 2, desktop: 3 }} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false} className="testimonials-swiper">
         {SAMPLE_TESTIMONIALS.map((t, i) => (
           <article key={i} className="flex h-full flex-col rounded border border-line bg-white p-5">
             <p className="text-sm font-semibold uppercase tracking-wide text-brass">Sample</p>
@@ -247,6 +264,21 @@ export default function Home() {
           </article>
         ))}
       </RawkSwiper>
+    </Section>
+
+    {/* 7 — FAQs */}
+    <Section id="faqs" eyebrow="FAQs" title="Frequently Asked Questions" sub="Answers about ordering from Vinayak Enterprises (RAWK) — products, bulk orders and the shop.">
+      <div className="rounded border border-line bg-white px-5">
+        {FAQS.map((f) => (
+          <details key={f.q} className="faq-item border-b border-line last:border-0">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 font-bold text-navy">
+              {f.q}
+              <img src="/icons/plus.svg" alt="" aria-hidden="true" width={16} height={16} className="faq-toggle h-4 w-4 shrink-0" />
+            </summary>
+            <p className="pb-4 leading-relaxed text-body">{f.a}</p>
+          </details>
+        ))}
+      </div>
     </Section>
 
     <section className="mx-auto w-full max-w-[1440px] px-4 pb-12 sm:px-[30px] lg:px-12">

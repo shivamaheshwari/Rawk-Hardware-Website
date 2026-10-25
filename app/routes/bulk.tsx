@@ -18,7 +18,7 @@ export default function Bulk() {
   return (<div className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-8">
     <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "Bulk Orders", path: "/bulk-orders" }]} />
     <h1 className="mt-3 font-serif text-4xl text-navy">Buying for a project or your store?</h1>
-    <p className="mt-2 max-w-2xl text-body">Share product codes, quantities and your city. Request availability and a tailored quote. No minimum order quantity, lead time or discount is promised on this page — the shop confirms terms privately.</p>
+    <p className="mt-2 max-w-2xl text-body">Share product codes, quantities and your city. Request availability and a tailored quote. Minimum bulk order: Rs 2,000. Lead time and discount are confirmed by the shop privately.</p>
     <div className="mt-6"><LeadForm source="bulk-orders" heading="Request a bulk quote" /></div>
   </div>);
 }

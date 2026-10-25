@@ -56,3 +56,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* Mega menu: fade + slight slide-down on open, like the reference menu. */
 .mega-menu { animation: mega-in 0.25s ease-out; }
 @keyframes mega-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Testimonials: every card the same height (slides stretch to the row,
+   and the card fills its slide), even when quotes differ in length. */
+.testimonials-swiper .swiper-slide { height: auto; display: flex; }
+.testimonials-swiper .swiper-slide > article { flex: 1 1 auto; width: 100%; }
+
+/* FAQ accordion: plus icon turns into a cross when open. */
+.faq-item summary { list-style: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item .faq-toggle { transition: transform 0.3s ease; }
+.faq-item[open ] .faq-toggle { transform: rotate(45deg); }
