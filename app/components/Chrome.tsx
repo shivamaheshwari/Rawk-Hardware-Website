@@ -23,12 +23,11 @@ function LogoImg({ local, drive, alt }: { local: string; drive: string; alt: str
   const [stage, setStage] = useState(0);
   if (stage === 2) return <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>;
   const src = stage === 0 ? local : drive;
-  return <img src={src} alt={alt} className="aspect-[2/1] w-[70px] object-contain" onError={() => setStage((v) => v + 1)} />;
+  return <img src={src} alt={alt} className="aspect-[2/1] h-[100px] w-auto object-contain" onError={() => setStage((v) => v + 1)} />;
 }
 function Wordmark() {
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
     <LogoImg local="/images/rawk-logo-black.png" drive={LOGO_BLACK} alt="RAWK" />
-    <span className="text-[11px] font-bold tracking-[0.15em] text-muted">We Believe in Quality</span>
   </Link>);
 }
 function FooterWordmark() {
@@ -220,7 +219,7 @@ export function Footer() {
         <p className="font-serif text-xl">Let&apos;s find the right hardware for your space.</p>
         <RawkButton to="/contact" variant="onDark" arrow>Talk to Our Team</RawkButton>
       </div>
-      <p className="border-t border-white/15 px-4 py-4 text-center text-xs text-white/60">© {year} RAWK — We Believe in Quality. Product specifications shown are as supplied; preview items are marked and must be confirmed before launch.</p>
+      <p className="border-t border-white/15 px-4 py-4 text-center text-xs text-white/60">© {year} RAWK. Product specifications shown are as supplied; preview items are marked and must be confirmed before launch.</p>
     </div>
   </footer>);
 }

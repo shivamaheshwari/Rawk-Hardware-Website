@@ -48,7 +48,6 @@ type FilterBarProps = {
   activeCount: number;
   search?: { value: string; placeholder?: string };
   onValueChange: (key: string, value: string) => void;
-  onSortChange: (value: string) => void;
   onClearAll: () => void;
   onSearch?: (q: string) => void;
   onApplyDraft?: (values: FilterValues, sort: string, searchQ?: string) => void;
@@ -63,6 +62,17 @@ function CheckBox({ checked, label, onClick }: { checked: boolean; label: string
   );
 }
 
+export function SortControl({ sort, sortOptions, onSortChange }: { sort: string; sortOptions: { value: string; label: string }[]; onSortChange: (value: string) => void }) {
+  return (
+    <label className="flex items-center gap-2 text-sm text-navy">
+      <span className="text-muted">Sort By:</span>
+      <select value={sort} onChange={(e) => onSortChange(e.target.value)} className="min-h-11 rounded-lg border border-line bg-white px-2 font-bold text-navy">
+        {sortOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+      </select>
+    </label>
+  );
+}
+
 function ToggleIcon({ open }: { open: boolean }) {
   return <img src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5 shrink-0" />;
 }
@@ -71,7 +81,7 @@ const toggleIn = (arr: string[], value: string) => (arr.includes(value) ? arr.fi
 
 export default function FilterBar({
   groups, values, sort, sortOptions, activeCount, search,
-  onValueChange, onSortChange, onClearAll, onSearch, onApplyDraft,
+  onValueChange, onClearAll, onSearch, onApplyDraft,
 }: FilterBarProps) {
   const [expanded, setExpanded] = useState(true);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -109,9 +119,6 @@ export default function FilterBar({
             <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-11 items-center gap-2 text-sm font-bold uppercase tracking-wide text-navy">
               Filters <ToggleIcon open={expanded} />
             </button>
-            {activeCount > 0 && (
-              <button type="button" onClick={onClearAll} className="ml-auto min-h-11 text-sm font-bold text-navy underline">Clear All ({activeCount})</button>
-            )}
           </div>
           {expanded && (
             <div className="flex flex-wrap items-center gap-2 border-t border-line py-3">
@@ -127,12 +134,9 @@ export default function FilterBar({
                   </button>
                 );
               })}
-              <label className="ml-auto flex items-center gap-2 text-sm text-navy">
-                <span className="text-muted">Sort By:</span>
-                <select value={sort} onChange={(e) => onSortChange(e.target.value)} className="min-h-11 rounded-lg border border-line bg-white px-2 font-bold text-navy">
-                  {sortOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
-                </select>
-              </label>
+              {activeCount > 0 && (
+                <button type="button" onClick={onClearAll} className="ml-auto min-h-11 text-sm font-bold text-navy underline">Clear All ({activeCount})</button>
+              )}
             </div>
           )}
           {expanded && openGroupDef && (

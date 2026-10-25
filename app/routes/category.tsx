@@ -6,7 +6,7 @@ import { canonical, breadcrumbJsonLd } from "../lib/seo";
 import ProductCard from "../components/ProductCard";
 import { JsonLd } from "../components/Misc";
 import ListingBanner from "../components/ListingBanner";
-import FilterBar, { scrollToResults, type FilterValues } from "../components/FilterBar";
+import FilterBar, { SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
 export type CategoryData = { cat: Category; products: Product[] };
 export const loader: LoaderFunction = ({ params }): CategoryData => {
   const cat = categoryBySlug(params.slug ?? "");
@@ -68,12 +68,14 @@ export default function Category() {
         sortOptions={SORT_OPTIONS}
         activeCount={activeCount}
         onValueChange={(key, value) => { scrollFlag.current = true; setValues((v) => ({ ...v, [key]: toggleIn(v[key] ?? [], value) })); }}
-        onSortChange={(value) => { scrollFlag.current = true; setSort(value); }}
         onClearAll={clearAll}
         onApplyDraft={(draft, draftSort) => { scrollFlag.current = true; setValues({ finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [] }); setSort(draftSort); }}
       />
       <div ref={resultsRef} className="mx-auto w-full max-w-[1440px] scroll-mt-[160px] px-4 pb-40 pt-8 sm:px-[30px] lg:scroll-mt-[250px] lg:px-12 lg:pb-10">
-        <p className="mb-6 text-sm text-muted">Showing {filtered.length} of {products.length} products</p>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted">Showing {filtered.length} of {products.length} products</p>
+          <SortControl sort={sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => { scrollFlag.current = true; setSort(value); }} />
+        </div>
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-line bg-white p-8 text-center">
             <h2 className="font-serif text-2xl text-navy">No matching products</h2>

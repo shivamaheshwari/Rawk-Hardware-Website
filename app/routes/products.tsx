@@ -5,7 +5,7 @@ import { canonical } from "../lib/seo";
 import { CATEGORIES } from "../data/products";
 import ProductCard from "../components/ProductCard";
 import ListingBanner from "../components/ListingBanner";
-import FilterBar, { scrollToResults, type FilterValues } from "../components/FilterBar";
+import FilterBar, { SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
 import { whatsappUrl } from "../lib/site";
 export const loader = listingLoader;
 export const meta: MetaFunction = () => [{ title: "All Products | RAWK" }, { name: "description", content: "Browse all RAWK handles, knobs, locks, hinges, drain jali and drain pipes. Filter by category, finish, material and application." }, { tagName: "link", rel: "canonical", href: canonical("/products") }];
@@ -55,7 +55,6 @@ export default function Products() {
         activeCount={activeCount}
         search={{ value: filters.q, placeholder: "Title, SKU…" }}
         onValueChange={(key, value) => go({ [key]: toggleIn(filters[key as "category" | "finish" | "material" | "application"], value) } as Partial<FilterState>)}
-        onSortChange={(value) => go({ sort: value })}
         onClearAll={() => { scrollFlag.current = true; navigate("/products", { preventScrollReset: true }); }}
         onSearch={(q) => go({ q })}
         onApplyDraft={(draft, draftSort, searchQ) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, { category: draft.category ?? [], finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [], sort: draftSort, q: searchQ ?? filters.q })}`, { preventScrollReset: true }); }}
@@ -64,10 +63,16 @@ export default function Products() {
         {filters.q ? (
           <div className="mb-6">
             <h2 className="font-serif text-2xl text-navy sm:text-3xl">Results for &ldquo;{filters.q}&rdquo;</h2>
-            <p className="mt-1 text-sm text-muted">Showing {products.length} of {total} products</p>
+            <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-muted">Showing {products.length} of {total} products</p>
+              <SortControl sort={filters.sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => go({ sort: value })} />
+            </div>
           </div>
         ) : (
-          <p className="mb-6 text-sm text-muted">Showing {products.length} of {total} products</p>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted">Showing {products.length} of {total} products</p>
+            <SortControl sort={filters.sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => go({ sort: value })} />
+          </div>
         )}
         {products.length === 0 ? (
           <div className="rounded-xl border border-line bg-white p-8 text-center">
