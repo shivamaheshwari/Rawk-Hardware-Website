@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, type MetaFunction } from "react-router";
 import type { Swiper as SwiperType } from "swiper";
 import { PRODUCTS, type Product } from "../data/products";
@@ -76,7 +76,7 @@ function HeroSlide({ slide, isFirst }: { slide: (typeof HERO_SLIDES)[number]; is
   const p = PRODUCTS.find((x) => x.slug === slide.slug)!;
   const Heading = isFirst ? "h1" : "p";
   return (
-    <div className="grid bg-white lg:grid-cols-2">
+    <div className="grid h-full bg-white lg:grid-cols-2">
       <div className="order-2 flex flex-col justify-center px-6 py-10 sm:px-10 lg:order-1 lg:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brass">{slide.eyebrow}</p>
         <Heading className="mt-3 font-condensed text-4xl font-black leading-[1.05] text-navy sm:text-5xl lg:text-6xl">{slide.heading}</Heading>
@@ -129,6 +129,17 @@ export default function Home() {
   // page dots are exactly 5 (20 / 4). Products without a real photo yet
   // show the labelled placeholder panel — never a fake photo.
   const bestsellers = PRODUCTS.slice(0, 20);
+  // Mobile/tablet show only the first 8 best sellers (user request
+  // 2026-10-26); desktop shows all 20. The key remounts the slider when
+  // the set changes across the breakpoint (loop-mode safety).
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(mq.matches);
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const shownBestsellers = isDesktop ? bestsellers : bestsellers.slice(0, 8);
 
   const bulkImage = PRODUCTS.find((p) => p.slug === "509-handle")!;
   const [heroSwiper, setHeroSwiper] = useState<SwiperType | null>(null);
@@ -153,8 +164,9 @@ export default function Home() {
         label="Featured hardware"
         perView={{ mobile: 1, tablet: 1, desktop: 1 }}
         autoplay
-        autoplayMs={5000}
-        speed={400}
+        autoplayMs={4000}
+        speed={300}
+        className="hero-swiper"
         loop
         showArrows={false}
         showDots={false}
@@ -219,14 +231,15 @@ export default function Home() {
     {/* 4 — Best sellers: swiper slider on every width (user request
         2026-10-25): 1.5 cards visible on mobile, 2.5 on tablet, 4 on
         desktop, one card per swipe step, all cards equal height. No grid
-        and no Load More — swiping reveals all 20 best sellers. Note: a
-        hard 300px card floor would shrink the mobile peek to ~1.2 cards
+        and no Load More. Since 2026-10-26 mobile/tablet show only the
+        first 8 best sellers; desktop shows all 20. Note: a hard 300px
+        card floor would shrink the mobile peek to ~1.2 cards
         (1.5 x 300px = 450px > a 360px phone screen), so card width comes
         from the fractional view instead: ~230px phones, ~270-370px
         tablets, ~300px+ desktop. */}
     <Section id="best-sellers" eyebrow="Best Sellers" title="Our Best Sellers" action={<RawkButton to="/products" variant="secondary">View all products</RawkButton>}>
-      <RawkSwiper label="Best sellers" perView={{ mobile: 1.5, tablet: 2.5, desktop: 4 }} slidesPerGroup={1} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false} className="best-sellers-swiper">
-        {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
+      <RawkSwiper key={isDesktop ? "desktop" : "mobile"} label="Best sellers" perView={{ mobile: 1.5, tablet: 2.5, desktop: 4 }} slidesPerGroup={1} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false} className="best-sellers-swiper">
+        {shownBestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
       </RawkSwiper>
     </Section>
 

@@ -70,6 +70,11 @@ input[type="search"]:focus-visible, #drawer-search:focus-visible { outline: none
    on mobile, tablet and desktop slider views alike. */
 .best-sellers-swiper .swiper-slide { height: auto; display: flex; }
 .best-sellers-swiper .swiper-slide > article { flex: 1 1 auto; width: 100%; }
+/* Hero: every slide the same size (user request 2026-10-26 — on mobile
+   the slides differed because their text lengths differ). Slides stretch
+   to the tallest one and each slide's content fills its slide. */
+.hero-swiper .swiper-slide { height: auto; display: flex; }
+.hero-swiper .swiper-slide > div { flex: 1 1 auto; width: 100%; }
 
 /* FAQ accordion: plus icon turns into a cross when open. */
 .faq-item summary { list-style: none; }
