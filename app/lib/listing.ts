@@ -12,6 +12,7 @@ export function parseFilters(url: URL): FilterState {
 export function applyFilters(f: FilterState) {
   let list = filterProducts(searchProducts(f.q), f);
   if (f.sort === "name") list = [...list].sort((a, b) => a.title.localeCompare(b.title));
+  else if (f.sort === "name-desc") list = [...list].sort((a, b) => b.title.localeCompare(a.title));
   else if (f.sort === "featured") list = [...list].sort((a, b) => Number(b.featured) - Number(a.featured));
   return list;
 }

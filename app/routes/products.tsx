@@ -13,6 +13,7 @@ export const meta: MetaFunction = () => [{ title: "All Products | RAWK" }, { nam
 const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
   { value: "name", label: "Name A–Z" },
+  { value: "name-desc", label: "Name Z–A" },
 ];
 
 const toggleIn = (arr: string[], value: string) => (arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);

@@ -19,6 +19,7 @@ export const meta: MetaFunction = ({ data }) => { const d = data as CategoryData
 const SORT_OPTIONS = [
   { value: "featured", label: "Featured" },
   { value: "name", label: "Name A–Z" },
+  { value: "name-desc", label: "Name Z–A" },
 ];
 
 const EMPTY_VALUES: FilterValues = { finish: [], material: [], application: [] };
@@ -36,6 +37,7 @@ export default function Category() {
   const filtered = useMemo(() => {
     const list = filterProducts(products, values);
     if (sort === "name") return [...list].sort((a, b) => a.title.localeCompare(b.title));
+    if (sort === "name-desc") return [...list].sort((a, b) => b.title.localeCompare(a.title));
     return [...list].sort((a, b) => Number(b.featured) - Number(a.featured));
   }, [products, values, sort]);
   // After a filter apply, scroll to the results (never back to the banner):
