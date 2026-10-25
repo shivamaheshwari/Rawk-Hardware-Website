@@ -6,7 +6,8 @@ import { canonical, breadcrumbJsonLd } from "../lib/seo";
 import ProductCard from "../components/ProductCard";
 import { JsonLd } from "../components/Misc";
 import ListingBanner from "../components/ListingBanner";
-import FilterBar, { SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
+import FilterBar, { Pagination, SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
+import { PAGE_SIZE } from "../lib/listing";
 export type CategoryData = { cat: Category; products: Product[] };
 export const loader: LoaderFunction = ({ params }): CategoryData => {
   const cat = categoryBySlug(params.slug ?? "");
@@ -29,6 +30,7 @@ export default function Category() {
   const { cat, products } = useLoaderData() as CategoryData;
   const [values, setValues] = useState<FilterValues>({ ...EMPTY_VALUES });
   const [sort, setSort] = useState("featured");
+  const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const scrollFlag = useRef(false);
   const finishes = useMemo(() => [...new Set(products.flatMap((p) => p.finishes))].sort(), [products]);
@@ -52,7 +54,11 @@ export default function Category() {
     { key: "material", label: "Material", options: materials },
     { key: "application", label: "Application", options: applications },
   ];
-  const clearAll = () => { scrollFlag.current = true; setValues({ ...EMPTY_VALUES }); };
+  const clearAll = () => { scrollFlag.current = true; setValues({ ...EMPTY_VALUES }); setPage(1); };
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const goPage = (n: number) => { scrollFlag.current = true; setPage(n); };
   return (
     <div>
       <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Products", path: "/products" }, { name: cat.name, path: `/categories/${cat.slug}` }])} />
@@ -69,14 +75,14 @@ export default function Category() {
         sort={sort}
         sortOptions={SORT_OPTIONS}
         activeCount={activeCount}
-        onValueChange={(key, value) => { scrollFlag.current = true; setValues((v) => ({ ...v, [key]: toggleIn(v[key] ?? [], value) })); }}
+        onValueChange={(key, value) => { scrollFlag.current = true; setPage(1); setValues((v) => ({ ...v, [key]: toggleIn(v[key] ?? [], value) })); }}
         onClearAll={clearAll}
-        onApplyDraft={(draft, draftSort) => { scrollFlag.current = true; setValues({ finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [] }); setSort(draftSort); }}
+        onApplyDraft={(draft, draftSort) => { scrollFlag.current = true; setPage(1); setValues({ finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [] }); setSort(draftSort); }}
       />
       <div ref={resultsRef} className="mx-auto w-full max-w-[1440px] scroll-mt-[160px] px-4 pb-40 pt-8 sm:px-[30px] lg:scroll-mt-[250px] lg:px-12 lg:pb-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted">Showing {filtered.length} of {products.length} products</p>
-          <SortControl sort={sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => { scrollFlag.current = true; setSort(value); }} />
+          <p className="text-sm text-muted">Showing {paged.length} of {filtered.length} products</p>
+          <SortControl sort={sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => { scrollFlag.current = true; setPage(1); setSort(value); }} />
         </div>
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-line bg-white p-8 text-center">
@@ -85,7 +91,10 @@ export default function Category() {
             <button type="button" onClick={clearAll} className="mt-4 min-h-11 rounded-full border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-transparent hover:text-navy">Clear filters</button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{filtered.map((p) => (<ProductCard key={p.slug} p={p} />))}</div>
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">{paged.map((p) => (<ProductCard key={p.slug} p={p} mobileListing />))}</div>
+            <Pagination page={safePage} totalPages={totalPages} onPageChange={goPage} />
+          </>
         )}
         <p className="mt-6"><Link to="/products" prefetch="intent" className="font-semibold text-navy underline">← All products</Link></p>
       </div>

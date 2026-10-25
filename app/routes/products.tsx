@@ -5,7 +5,7 @@ import { canonical } from "../lib/seo";
 import { CATEGORIES } from "../data/products";
 import ProductCard from "../components/ProductCard";
 import ListingBanner from "../components/ListingBanner";
-import FilterBar, { SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
+import FilterBar, { Pagination, SortControl, scrollToResults, type FilterValues } from "../components/FilterBar";
 import { whatsappUrl } from "../lib/site";
 export const loader = listingLoader;
 export const meta: MetaFunction = () => [{ title: "All Products | RAWK" }, { name: "description", content: "Browse all RAWK handles, knobs, locks, hinges, drain jali and drain pipes. Filter by category, finish, material and application." }, { tagName: "link", rel: "canonical", href: canonical("/products") }];
@@ -19,7 +19,7 @@ const SORT_OPTIONS = [
 const toggleIn = (arr: string[], value: string) => (arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
 
 export default function Products() {
-  const { products, filters, finishes, materials, applications, total } = useLoaderData() as ListingData;
+  const { products, filters, finishes, materials, applications, totalFiltered, totalPages } = useLoaderData() as ListingData;
   const navigate = useNavigate();
   const resultsRef = useRef<HTMLDivElement>(null);
   const scrollFlag = useRef(false);
@@ -30,7 +30,8 @@ export default function Products() {
   useEffect(() => {
     if (scrollFlag.current) { scrollFlag.current = false; scrollToResults(resultsRef.current); }
   }, [products]);
-  const go = (patch: Partial<FilterState>) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, patch)}`, { preventScrollReset: true }); };
+  const go = (patch: Partial<FilterState>) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, { ...patch, page: 1 })}`, { preventScrollReset: true }); };
+  const goPage = (page: number) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, { page })}`, { preventScrollReset: true }); };;
   const values: FilterValues = {
     category: filters.category, finish: filters.finish, material: filters.material, application: filters.application,
   };
@@ -58,20 +59,20 @@ export default function Products() {
         onValueChange={(key, value) => go({ [key]: toggleIn(filters[key as "category" | "finish" | "material" | "application"], value) } as Partial<FilterState>)}
         onClearAll={() => { scrollFlag.current = true; navigate("/products", { preventScrollReset: true }); }}
         onSearch={(q) => go({ q })}
-        onApplyDraft={(draft, draftSort, searchQ) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, { category: draft.category ?? [], finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [], sort: draftSort, q: searchQ ?? filters.q })}`, { preventScrollReset: true }); }}
+        onApplyDraft={(draft, draftSort, searchQ) => { scrollFlag.current = true; navigate(`/products${filterQuery(filters, { category: draft.category ?? [], finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [], sort: draftSort, q: searchQ ?? filters.q, page: 1 })}`, { preventScrollReset: true }); }}
       />
       <div ref={resultsRef} className="mx-auto w-full max-w-[1440px] scroll-mt-[160px] px-4 pb-40 pt-8 sm:px-[30px] lg:scroll-mt-[250px] lg:px-12 lg:pb-10">
         {filters.q ? (
           <div className="mb-6">
             <h2 className="font-serif text-2xl text-navy sm:text-3xl">Results for &ldquo;{filters.q}&rdquo;</h2>
             <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-muted">Showing {products.length} of {total} products</p>
+              <p className="text-sm text-muted">Showing {products.length} of {totalFiltered} products</p>
               <SortControl sort={filters.sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => go({ sort: value })} />
             </div>
           </div>
         ) : (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted">Showing {products.length} of {total} products</p>
+            <p className="text-sm text-muted">Showing {products.length} of {totalFiltered} products</p>
             <SortControl sort={filters.sort} sortOptions={SORT_OPTIONS} onSortChange={(value) => go({ sort: value })} />
           </div>
         )}
@@ -85,7 +86,10 @@ export default function Products() {
             </div>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{products.map((p) => (<ProductCard key={p.slug} p={p} />))}</div>
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">{products.map((p) => (<ProductCard key={p.slug} p={p} mobileListing />))}</div>
+            <Pagination page={filters.page} totalPages={totalPages} onPageChange={goPage} />
+          </>
         )}
       </div>
     </div>

@@ -73,6 +73,28 @@ export function SortControl({ sort, sortOptions, onSortChange }: { sort: string;
   );
 }
 
+// Pagination (user request 2026-10-26): 20 cards per page on the
+// listing pages. Shows Previous / page numbers / Next; the caller owns
+// the page state (URL param on /products, local state on category pages).
+export function Pagination({ page, totalPages, onPageChange }: { page: number; totalPages: number; onPageChange: (page: number) => void }) {
+  if (totalPages <= 1) return null;
+  const pages: number[] = [];
+  const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const end = Math.min(totalPages, start + 4);
+  for (let i = start; i <= end; i++) pages.push(i);
+  const btn = "flex min-h-11 min-w-11 items-center justify-center rounded-full border px-3 text-sm font-semibold transition-colors duration-200";
+  return (
+    <nav aria-label="Pagination" className="mt-8 flex flex-wrap items-center justify-center gap-2">
+      <button type="button" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className={`${btn} ${page <= 1 ? "border-line bg-white text-muted opacity-50" : "border-navy bg-white text-navy hover:bg-navy hover:text-white"}`}>Previous</button>
+      {pages.map((n) => (
+        <button key={n} type="button" aria-current={n === page ? "page" : undefined} onClick={() => onPageChange(n)} className={`${btn} ${n === page ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy"}`}>{n}</button>
+      ))}
+      <button type="button" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} className={`${btn} ${page >= totalPages ? "border-line bg-white text-muted opacity-50" : "border-navy bg-white text-navy hover:bg-navy hover:text-white"}`}>Next</button>
+      <span className="w-full text-center text-sm text-muted sm:w-auto">Page {page} of {totalPages}</span>
+    </nav>
+  );
+}
+
 function ToggleIcon({ open }: { open: boolean }) {
   return <img src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5 shrink-0" />;
 }
