@@ -9,7 +9,26 @@ export const BUSINESS = {
   instagramUrl: "https://www.instagram.com/rawk_04",
   marketplacesNote: "Also available on Amazon, Flipkart and JioMart — links are shown only where a listing has been verified for that exact product.",
 };
-export const SITE_URL = process.env.SITE_URL ?? "https://www.rawk.example";
+// Debug fix: the previous default pointed canonical URLs, the sitemap and
+// JSON-LD at a placeholder example domain. Default to the live preview
+// host instead; a real custom domain can override it via SITE_URL.
+export const SITE_URL = process.env.SITE_URL ?? "https://rawk-hardware-website.vercel.app";
+
+/**
+ * Marketplace / social marquee entries. Only destinations that are verified
+ * for RAWK are linked. Flipkart, Meesho and JioMart have no verified
+ * RAWK store URL in this codebase, so they render as plain text — never
+ * as an invented link.
+ */
+export type Marketplace = { name: string; url: string | null; note: string };
+export const MARKETPLACES: Marketplace[] = [
+  { name: "amazon", url: "https://www.amazon.in/dp/B0GMD2D2JY", note: "Verified D2 listing — the only verified Amazon link" },
+  { name: "Flipkart", url: null, note: "Store link to be confirmed" },
+  { name: "meesho", url: null, note: "Store link to be confirmed" },
+  { name: "JioMart", url: null, note: "Store link to be confirmed" },
+  { name: "WhatsApp", url: "https://wa.me/919589133387?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20RAWK%20hardware%20products.", note: "Verified WhatsApp number 9589133387" },
+  { name: "Instagram", url: "https://www.instagram.com/rawk_04", note: "Verified profile @rawk_04" },
+];
 export function whatsappUrl(message: string) {
   return `https://wa.me/${BUSINESS.whatsappNumber}?text=${encodeURIComponent(message)}`;
 }

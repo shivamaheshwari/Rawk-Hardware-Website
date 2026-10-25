@@ -6,6 +6,7 @@ import { canonical, breadcrumbJsonLd, productJsonLd } from "../lib/seo";
 import ProductCard, { ProductImage } from "../components/ProductCard";
 import { Breadcrumbs, Faq, JsonLd } from "../components/Misc";
 import { useEnquiry } from "../components/Chrome";
+import RawkButton from "../components/RawkButton";
 export type ProductData = { p: Product };
 export const loader: LoaderFunction = ({ params }): ProductData => {
   const p = productBySlug(params.slug ?? "");
@@ -74,9 +75,9 @@ export default function ProductPage() {
         <label className="mt-4 block font-semibold text-navy">Quantity
           <input type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="mt-2 block min-h-11 w-32 rounded-lg border border-line bg-white px-3" /></label>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a href={wa} target="_blank" rel="noreferrer" className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-wa px-4 font-semibold text-white sm:flex-none sm:px-6">Enquire on WhatsApp</a>
-          <Link to={`/bulk-orders?sku=${encodeURIComponent(variant.sku)}&qty=${qty}`} className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-navy px-4 font-semibold text-white sm:flex-none sm:px-6">Request Quote</Link>
-          {variant.amazon_url && (<a href={variant.amazon_url} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center rounded-lg border border-navy px-4 font-semibold text-navy">View on Amazon ↗</a>)}
+          <RawkButton variant="whatsapp" href={wa} target="_blank" className="flex-1 sm:flex-none sm:px-6">Enquire on WhatsApp</RawkButton>
+          <RawkButton to={`/bulk-orders?sku=${encodeURIComponent(variant.sku)}&qty=${qty}`} className="flex-1 sm:flex-none sm:px-6">Request Quote</RawkButton>
+          {variant.amazon_url && (<RawkButton variant="secondary" href={variant.amazon_url} target="_blank">View on Amazon ↗</RawkButton>)}
         </div>
         <p className="mt-2 text-xs text-muted">WhatsApp opens a draft message — you send it yourself. The Amazon button appears only for this verified listing.</p>
       </div>

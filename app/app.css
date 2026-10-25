@@ -1,12 +1,34 @@
 @import "tailwindcss";
 @theme {
-  --color-navy: #10243A; --color-ivory: #F7F4EE; --color-brass: #B38A48;
-  --color-body: #263342; --color-muted: #596574; --color-line: #E2E5E9; --color-wa: #176B42;
+  /* Design.md tokens: warm ivory, charcoal primary, sparing brass accent. */
+  --color-navy: #22211e; --color-ivory: #faf8f3; --color-brass: #a47a3c;
+  --color-body: #2e2b26; --color-muted: #66625b; --color-line: #e5e0d7; --color-wa: #176b42;
   --font-serif: "DM Serif Display", Georgia, serif; --font-sans: Inter, system-ui, sans-serif;
 }
 html { scroll-behavior: smooth; }
-body { background: #F7F4EE; color: #263342; font-family: Inter, system-ui, sans-serif; }
+body { background: #faf8f3; color: #2e2b26; font-family: Inter, system-ui, sans-serif; }
 a, button { -webkit-tap-highlight-color: transparent; }
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #B38A48; outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #a47a3c; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+
+/* Marketplace marquee: seamless 30s loop, paused by .marquee-paused. */
+@keyframes rawk-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.rawk-marquee-track { animation: rawk-marquee 30s linear infinite; will-change: transform; }
+.rawk-marquee-track.marquee-paused { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .rawk-marquee-track { animation: none; flex-wrap: wrap; }
+}
+
+/* Footer link groups: expandable on mobile, always visible on desktop. */
+.footer-group summary::-webkit-details-marker { display: none; }
+.footer-group summary::marker { content: ""; }
+@media (min-width: 1024px) {
+  .footer-group > div { display: block !important; }
+  .footer-group summary { cursor: default; }
+  .footer-group summary::-webkit-details-marker { display: none; }
+  .footer-group summary .footer-chevron { display: none; }
+}
+
+/* Swiper: keep the default pagination invisible — RawkSwiper renders its own dots. */
+.swiper { overflow: hidden; }
