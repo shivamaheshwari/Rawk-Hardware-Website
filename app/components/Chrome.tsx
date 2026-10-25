@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Form, Link, NavLink, Outlet, useLocation } from "react-router";
 import { BUSINESS, whatsappUrl } from "../lib/site";
-import { CATEGORIES } from "../data/products";
+import { CATEGORIES, allFinishes } from "../data/products";
 import RawkButton from "./RawkButton";
 
 export const EnquiryContext = createContext<{ message: string; setMessage: (m: string) => void }>({ message: "Hello, I would like to enquire about RAWK hardware products.", setMessage: () => {} });
@@ -87,7 +87,7 @@ export function Header() {
     {megaOpen && (
       <div className="mega-menu absolute left-0 right-0 top-full z-50 hidden overflow-hidden border-b border-line bg-white shadow-xl lg:block" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
         <div aria-hidden className="pointer-events-none absolute right-0 top-0 h-[130px] w-[320px] rounded-bl-full bg-brass" />
-        <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-[auto_auto_auto_280px] gap-12 px-12 pb-10 pt-10">
+        <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-[auto_auto_auto_auto_280px] gap-10 px-12 pb-10 pt-10">
           <div>
             <Link to="/products" prefetch="intent" onClick={() => setMegaOpen(false)} className="text-base font-bold uppercase tracking-wide text-navy hover:text-brass">Shop All Products</Link>
           </div>
@@ -101,6 +101,12 @@ export function Header() {
             <p className="text-sm font-bold uppercase tracking-wide text-navy">By Use Area</p>
             <ul className="mt-4 space-y-3">
               {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{label}</Link></li>))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Finish</p>
+            <ul className="mt-4 space-y-3">
+              {allFinishes.map((f) => (<li key={f}><Link to={`/products?finish=${encodeURIComponent(f)}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{f}</Link></li>))}
             </ul>
           </div>
           <div className="relative flex flex-col items-center text-center">
