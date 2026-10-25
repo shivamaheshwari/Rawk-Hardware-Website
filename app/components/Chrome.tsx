@@ -228,27 +228,21 @@ export function Header() {
   </>);
 }
 
-// Footer link groups (user request 2026-10-26): on mobile they stay
-// COLLAPSED until tapped, and the toggle uses the project's own
+// Footer link groups (user request 2026-10-26): initially COLLAPSED on
+// every width until tapped, and the toggle uses the project's own
 // plus/minus SVGs properly — plus when closed, minus when open. The
 // SVGs are black strokes, so they are inverted to white on this dark
-// footer. On desktop (lg+) the groups are always shown and the icon
-// is hidden; resizing across the breakpoint re-syncs the state.
+// footer. (Round 16 had them collapsed on mobile only and always shown
+// on desktop; this round changes that to collapsed initially everywhere.)
 function FooterGroup({ title, children }: { title: string; children: ReactNode }) {
-  const [open, setOpen] = useState(() => typeof window !== "undefined" ? window.matchMedia("(min-width: 1024px)").matches : true);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const sync = () => setOpen(mq.matches);
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const [open, setOpen] = useState(false);
   return (
     <div className="border-b border-white/15 py-2 lg:border-0 lg:py-0">
-      <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex w-full cursor-pointer items-center justify-between font-semibold lg:cursor-default">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="flex w-full cursor-pointer items-center justify-between font-semibold">
         {title}
-        <img key={open ? "minus" : "plus"} src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5 shrink-0 invert lg:hidden" />
+        <img key={open ? "minus" : "plus"} src={open ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5 shrink-0 invert" />
       </button>
-      <div className={open ? "mt-2" : "mt-2 hidden lg:block"}>{children}</div>
+      <div className={open ? "mt-2" : "mt-2 hidden"}>{children}</div>
     </div>
   );
 }

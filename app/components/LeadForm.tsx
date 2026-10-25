@@ -3,7 +3,7 @@ import { Form, useActionData, useNavigation, useSearchParams } from "react-route
 import { whatsappUrl } from "../lib/site";
 import RawkButton from "./RawkButton";
 export type ActionResult = { ok: boolean; errors?: Record<string, string>; values?: Record<string, string>; duplicate?: boolean; error?: string };
-export default function LeadForm({ source, heading }: { source: string; heading: string }) {
+export default function LeadForm({ source, heading, showBuyingPurpose }: { source: string; heading: string; showBuyingPurpose?: boolean }) {
   const action = useActionData() as ActionResult | undefined;
   const nav = useNavigation();
   const [params] = useSearchParams();
@@ -28,6 +28,13 @@ export default function LeadForm({ source, heading }: { source: string; heading:
       <label className="block text-sm font-medium text-navy">Full name *<input name="name" defaultValue={v("name")} required className="mt-1 min-h-11 w-full rounded-lg border border-line px-3 font-normal" />{action?.errors?.name && <span className="text-red-700">{action.errors.name}</span>}</label>
       <label className="block text-sm font-medium text-navy">I am a<select name="customerType" defaultValue={v("customerType", "Retail buyer")} className="mt-1 min-h-11 w-full rounded-lg border border-line bg-white px-2 font-normal">
         {["Retail buyer", "Dealer / retailer", "Interior designer", "Carpenter / contractor", "Other"].map((o) => (<option key={o}>{o}</option>))}</select></label>
+      {showBuyingPurpose && (<fieldset className="sm:col-span-2">
+        <legend className="text-sm font-medium text-navy">Buying for a personal or reselling purpose?</legend>
+        <div className="mt-2 flex flex-wrap gap-5">
+          <label className="flex items-center gap-2 text-sm font-normal text-navy"><input type="radio" name="buyingPurpose" value="Personal" defaultChecked={v("buyingPurpose") === "Personal"} className="h-5 w-5" />Personal</label>
+          <label className="flex items-center gap-2 text-sm font-normal text-navy"><input type="radio" name="buyingPurpose" value="Reselling" defaultChecked={v("buyingPurpose") === "Reselling"} className="h-5 w-5" />Reselling</label>
+        </div>
+      </fieldset>)}
       <label className="block text-sm font-medium text-navy">Phone<input name="phone" type="tel" defaultValue={v("phone")} className="mt-1 min-h-11 w-full rounded-lg border border-line px-3 font-normal" />{action?.errors?.phone && <span className="text-red-700">{action.errors.phone}</span>}</label>
       <label className="block text-sm font-medium text-navy">Email<input name="email" type="email" defaultValue={v("email")} className="mt-1 min-h-11 w-full rounded-lg border border-line px-3 font-normal" />{action?.errors?.email && <span className="text-red-700">{action.errors.email}</span>}</label>
       {action?.errors?.contact && <p role="alert" className="text-sm text-red-700 sm:col-span-2">{action.errors.contact} (Phone or email is required.)</p>}

@@ -5,7 +5,7 @@ import path from "node:path";
 // action returns success only after persistence, and records
 // notification: "pending — no mail provider configured" so staff know to
 // check the file. See README § "Before launch".
-export type LeadInput = { name: string; customerType: string; phone: string; email: string; city: string; sku: string; quantity: string; notes: string; marketing: boolean; source: string; token: string };
+export type LeadInput = { name: string; customerType: string; buyingPurpose: string; phone: string; email: string; city: string; sku: string; quantity: string; notes: string; marketing: boolean; source: string; token: string };
 export function validateLead(d: LeadInput): Record<string, string> {
   const errs: Record<string, string> = {};
   if (!d.name.trim()) errs.name = "Name is required.";
@@ -30,5 +30,5 @@ export async function saveLead(d: LeadInput): Promise<{ ok: boolean; id?: string
 }
 export function formLead(form: FormData, source: string): LeadInput {
   const s = (k: string) => String(form.get(k) ?? "");
-  return { name: s("name"), customerType: s("customerType"), phone: s("phone"), email: s("email"), city: s("city"), sku: s("sku"), quantity: s("quantity"), notes: s("notes"), marketing: form.get("marketing") === "on", source, token: s("token") };
+  return { name: s("name"), customerType: s("customerType"), buyingPurpose: s("buyingPurpose"), phone: s("phone"), email: s("email"), city: s("city"), sku: s("sku"), quantity: s("quantity"), notes: s("notes"), marketing: form.get("marketing") === "on", source, token: s("token") };
 }
