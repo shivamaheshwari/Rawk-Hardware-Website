@@ -85,7 +85,7 @@ export function Header() {
   }, [open]);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
   const closeMega = () => { setMegaOpen(false); megaButtonRef.current?.focus(); };
-  return (<header ref={headerRef} onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
+  return (<><header ref={headerRef} onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
       Hardware for every detail of your home.
     </div>
@@ -138,7 +138,7 @@ export function Header() {
             </ul>
           </div>
           <div className="relative flex flex-col items-center text-center">
-            <div className="pt-[110px]">
+            <div>
               <img src="/images/509-handle-overview.jpg" alt="RAWK 509 cabinet handle in Golden White" width={240} height={180} loading="lazy" className="h-[180px] w-[240px] object-cover" />
               <p className="mt-4 text-base font-bold text-navy">Connect with us ?</p>
               <p className="mx-auto mt-1 max-w-[240px] text-sm leading-relaxed text-muted">Quick support for product enquiries, bulk orders and project requirements.</p>
@@ -149,6 +149,7 @@ export function Header() {
         <svg aria-hidden className="block h-6 w-full text-ivory" preserveAspectRatio="none" viewBox="0 0 1440 24"><path d="M0,24 C240,0 480,0 720,12 C960,24 1200,24 1440,0 L1440,24 L0,24 Z" fill="currentColor" /></svg>
       </div>
     )}
+  </header>
     {open && (
       <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
         <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="absolute inset-0 h-full w-full bg-black/50" />
@@ -170,7 +171,7 @@ export function Header() {
         </div>
       </div>
     )}
-  </header>);
+  </>);
 }
 
 function FooterGroup({ title, children }: { title: string; children: ReactNode }) {
@@ -228,7 +229,7 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 sm:px-[30px] sm:py-5 lg:hidden">
+  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white p-[16px] sm:p-[16px] lg:hidden lg:px-[20px] lg:py-[30px]">
     <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
     <RawkButton to="/bulk-orders" className="flex-1">Bulk Quote</RawkButton>
   </div>);

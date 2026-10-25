@@ -74,18 +74,19 @@ export default function MarketplaceMarquee() {
           showArrows={false}
           showDots={false}
         >
-          {MARKETPLACES.map((m) => {
+          {[...MARKETPLACES, ...MARKETPLACES].map((m, i) => {
             const content = (
               <span className="flex min-h-16 items-center justify-center whitespace-nowrap text-navy">
                 <LogoImage name={m.name} />
               </span>
             );
+            const key = `${m.name}-${i}`;
             return m.url ? (
-              <a key={m.name} href={m.url} target="_blank" rel="noreferrer" title={m.note} aria-label={m.name === "amazon" ? "Amazon" : m.name} className="transition-opacity duration-300 hover:opacity-70">
+              <a key={key} href={m.url} target="_blank" rel="noreferrer" title={m.note} aria-label={m.name === "amazon" ? "Amazon" : m.name} className="transition-opacity duration-300 hover:opacity-70">
                 {content}
               </a>
             ) : (
-              <span key={m.name} title={m.note} className="cursor-default">
+              <span key={key} title={m.note} className="cursor-default">
                 {content}
               </span>
             );

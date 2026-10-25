@@ -20,7 +20,7 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
 }
 export function Section({ title, sub, children, action, eyebrow, id }: { title: string; sub?: string; children: ReactNode; action?: ReactNode; eyebrow?: string; id?: string }) {
   // Padding: mobile 16px, tablet 20px vertical / 30px horizontal, desktop 48px sides.
-  return (<section id={id} className="mx-auto w-full max-w-[1440px] px-4 py-4 sm:px-[30px] sm:py-5 lg:px-12 lg:py-16">
+  return (<section id={id} className="mx-auto w-full max-w-[1440px] scroll-mt-[110px] px-4 py-4 sm:px-[30px] sm:py-5 lg:px-12 lg:py-16">
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>{eyebrow && <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brass">{eyebrow}</p>}<h2 className="mt-1 font-serif text-[28px] leading-tight text-navy sm:text-4xl">{title}</h2>{sub && <p className="mt-1 text-muted">{sub}</p>}</div>{action}
     </div>{children}</section>);
