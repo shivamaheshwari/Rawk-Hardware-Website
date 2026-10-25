@@ -67,11 +67,19 @@ export function Header() {
       <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
         <div onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)} className="relative">
           <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
-            Collections <span aria-hidden>{megaOpen ? "▴" : "▾"}</span>
+            Collections <img src={megaOpen ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
           </button>
           {megaOpen && (
-            <div className="absolute left-0 top-full z-50 w-[560px] max-w-[90vw] rounded border border-line bg-white p-6 shadow-lg" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
-              <div className="grid grid-cols-2 gap-6">
+            <div className="absolute left-0 top-full z-50 w-[840px] max-w-[92vw] rounded border border-line bg-white p-6 shadow-lg" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
+              <div className="grid grid-cols-4 gap-6">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">Shop All</p>
+                  <ul className="mt-3 space-y-2">
+                    {[["All products", "/products"], ["Best Sellers", "/#best-sellers"], ["Bulk Orders", "/bulk-orders"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
+                      <li key={to}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{label}</Link></li>
+                    ))}
+                  </ul>
+                </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">By product type</p>
                   <ul className="mt-3 space-y-2">
@@ -84,10 +92,11 @@ export function Header() {
                     {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{label}</Link></li>))}
                   </ul>
                 </div>
-              </div>
-              <div className="mt-6 flex flex-wrap gap-3 border-t border-line pt-4">
-                <RawkButton to="/products" onClick={() => setMegaOpen(false)}>View all products</RawkButton>
-                <RawkButton to="/bulk-orders" variant="secondary" onClick={() => setMegaOpen(false)}>Enquire for Bulk Orders</RawkButton>
+                <div className="rounded bg-ivory p-5">
+                  <p className="text-base font-bold text-navy">Connect with us ?</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">Quick support for product enquiries, bulk orders and project requirements.</p>
+                  <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-4 w-full" onClick={() => setMegaOpen(false)}>WhatsApp Enquiry</RawkButton>
+                </div>
               </div>
             </div>
           )}
@@ -103,7 +112,8 @@ export function Header() {
           <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#33312e]">Search</RawkButton>
         </Form>
       </div>
-      <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="order-4 hidden lg:inline-flex">WhatsApp Enquiry</RawkButton>
+      <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full bg-navy px-5 text-sm font-bold text-white transition-colors duration-300 hover:bg-[#33312e] lg:inline-flex">Buy From Amazon</RawkButton>
+      <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy px-5 text-sm font-bold text-navy transition-colors duration-300 hover:bg-navy hover:text-white lg:inline-flex">Contact Us</RawkButton>
     </div>
     {open && (
       <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
@@ -119,7 +129,8 @@ export function Header() {
             {[["Best Sellers", "/#best-sellers"], ["All products", "/products"], ["About Us", "/about"], ["Bulk Orders", "/bulk-orders"], ["Guides", "/guides"], ["Contact", "/contact"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
               <Link key={to} to={to} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
           </nav>
-          <div className="border-t border-line px-4 py-4">
+          <div className="flex flex-col gap-3 border-t border-line px-4 py-4">
+            <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="flex min-h-11 items-center justify-center rounded-full bg-navy px-5 text-sm font-bold text-white">Buy From Amazon</RawkButton>
             <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="w-full">WhatsApp Enquiry</RawkButton>
           </div>
         </div>
