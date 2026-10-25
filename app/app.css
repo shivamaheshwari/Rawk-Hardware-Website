@@ -52,3 +52,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .swiper .swiper-pagination { position: static; margin-top: 28px; display: flex; justify-content: center; gap: 10px; }
 .swiper .swiper-pagination-bullet { width: 12px; height: 12px; margin: 0 !important; background: #d8cfc0; opacity: 1; transition: width 0.5s ease, background-color 0.5s ease; }
 .swiper .swiper-pagination-bullet-active { width: 36px; border-radius: 9999px; background: #a47a3c; }
+
+/* Mega menu: fade + slight slide-down on open, like the reference menu. */
+.mega-menu { animation: mega-in 0.25s ease-out; }
+@keyframes mega-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

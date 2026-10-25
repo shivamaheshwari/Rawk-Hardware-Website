@@ -57,7 +57,7 @@ export function Header() {
   }, [open]);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
   const closeMega = () => { setMegaOpen(false); megaButtonRef.current?.focus(); };
-  return (<header className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
+  return (<header onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
       Hardware for every detail of your home.
     </div>
@@ -65,41 +65,10 @@ export function Header() {
       <Wordmark />
       <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><img src="/icons/menu-alt-1.svg" alt="" aria-hidden="true" width={22} height={22} className="h-[22px] w-[22px]" /> Menu</button>
       <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
-        <div onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)} className="relative">
-          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
+        <div>
+          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onMouseEnter={() => setMegaOpen(true)} onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
             Collections <img src={megaOpen ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
           </button>
-          {megaOpen && (
-            <div className="absolute left-0 top-full z-50 w-[840px] max-w-[92vw] rounded border border-line bg-white p-6 shadow-lg" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">Shop All</p>
-                  <ul className="mt-3 space-y-2">
-                    {[["All products", "/products"], ["Best Sellers", "/#best-sellers"], ["Bulk Orders", "/bulk-orders"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
-                      <li key={to}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{label}</Link></li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">By product type</p>
-                  <ul className="mt-3 space-y-2">
-                    {CATEGORIES.map((c) => (<li key={c.slug}><Link to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{c.name}</Link></li>))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">By use area</p>
-                  <ul className="mt-3 space-y-2">
-                    {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{label}</Link></li>))}
-                  </ul>
-                </div>
-                <div className="rounded bg-ivory p-5">
-                  <p className="text-base font-bold text-navy">Connect with us ?</p>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">Quick support for product enquiries, bulk orders and project requirements.</p>
-                  <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-4 w-full" onClick={() => setMegaOpen(false)}>WhatsApp Enquiry</RawkButton>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
         <Link to="/#best-sellers" prefetch="intent" className="text-[15px] font-bold text-navy">Best Sellers</Link>
         <NavLink to="/about" prefetch="intent" className={({ isActive }) => `text-[15px] font-bold ${isActive ? "text-brass" : "text-navy"}`}>About Us</NavLink>
@@ -115,6 +84,37 @@ export function Header() {
       <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full bg-navy px-5 text-sm font-bold text-white transition-colors duration-300 hover:bg-[#33312e] lg:inline-flex">Buy From Amazon</RawkButton>
       <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy px-5 text-sm font-bold text-navy transition-colors duration-300 hover:bg-navy hover:text-white lg:inline-flex">Contact Us</RawkButton>
     </div>
+    {megaOpen && (
+      <div className="mega-menu absolute left-0 right-0 top-full z-50 hidden overflow-hidden border-b border-line bg-white shadow-xl lg:block" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
+        <div aria-hidden className="pointer-events-none absolute right-0 top-0 h-[130px] w-[320px] rounded-bl-full bg-brass" />
+        <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-[auto_auto_auto_280px] gap-12 px-12 pb-10 pt-10">
+          <div>
+            <Link to="/products" prefetch="intent" onClick={() => setMegaOpen(false)} className="text-base font-bold uppercase tracking-wide text-navy hover:text-brass">Shop All Products</Link>
+          </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Product Type</p>
+            <ul className="mt-4 space-y-3">
+              {CATEGORIES.map((c) => (<li key={c.slug}><Link to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{c.name}</Link></li>))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Use Area</p>
+            <ul className="mt-4 space-y-3">
+              {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{label}</Link></li>))}
+            </ul>
+          </div>
+          <div className="relative flex flex-col items-center text-center">
+            <div className="pt-[110px]">
+              <img src="/images/509-handle-overview.jpg" alt="RAWK 509 cabinet handle in Golden White" width={240} height={180} loading="lazy" className="h-[180px] w-[240px] object-cover" />
+              <p className="mt-4 text-base font-bold text-navy">Connect with us ?</p>
+              <p className="mx-auto mt-1 max-w-[240px] text-sm leading-relaxed text-muted">Quick support for product enquiries, bulk orders and project requirements.</p>
+              <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-4" onClick={() => setMegaOpen(false)}>WhatsApp Enquiry</RawkButton>
+            </div>
+          </div>
+        </div>
+        <svg aria-hidden className="block h-6 w-full text-ivory" preserveAspectRatio="none" viewBox="0 0 1440 24"><path d="M0,24 C240,0 480,0 720,12 C960,24 1200,24 1440,0 L1440,24 L0,24 Z" fill="currentColor" /></svg>
+      </div>
+    )}
     {open && (
       <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
         <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="absolute inset-0 h-full w-full bg-black/50" />
