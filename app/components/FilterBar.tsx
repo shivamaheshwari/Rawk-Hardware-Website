@@ -115,7 +115,7 @@ export default function FilterBar({
       {/* Desktop sticky filter bar (sticks exactly under the header) */}
       <div className="filter-bar-desktop sticky z-30 hidden border-y border-line bg-white lg:block" style={{ top: "var(--header-height, 104px)" }}>
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-[30px] lg:px-12">
-          <div className="flex flex-wrap items-center gap-3 py-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-11 items-center gap-2 text-sm font-bold uppercase tracking-wide text-navy">
               Filters <ToggleIcon open={expanded} />
             </button>
