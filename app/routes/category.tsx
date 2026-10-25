@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLoaderData, type LoaderFunction, type MetaFunction } from "react-router";
 import type { Category, Product } from "../data/products";
 import { categoryBySlug, filterProducts, productsByCategory } from "../data/products";
@@ -6,7 +6,7 @@ import { canonical, breadcrumbJsonLd } from "../lib/seo";
 import ProductCard from "../components/ProductCard";
 import { JsonLd } from "../components/Misc";
 import ListingBanner from "../components/ListingBanner";
-import FilterBar, { type FilterValues } from "../components/FilterBar";
+import FilterBar, { scrollToResults, type FilterValues } from "../components/FilterBar";
 export type CategoryData = { cat: Category; products: Product[] };
 export const loader: LoaderFunction = ({ params }): CategoryData => {
   const cat = categoryBySlug(params.slug ?? "");
@@ -21,10 +21,15 @@ const SORT_OPTIONS = [
   { value: "name", label: "Name A–Z" },
 ];
 
+const EMPTY_VALUES: FilterValues = { finish: [], material: [], application: [] };
+const toggleIn = (arr: string[], value: string) => (arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
+
 export default function Category() {
   const { cat, products } = useLoaderData() as CategoryData;
-  const [values, setValues] = useState<FilterValues>({ finish: "", material: "", application: "" });
+  const [values, setValues] = useState<FilterValues>({ ...EMPTY_VALUES });
   const [sort, setSort] = useState("featured");
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const scrollFlag = useRef(false);
   const finishes = useMemo(() => [...new Set(products.flatMap((p) => p.finishes))].sort(), [products]);
   const materials = useMemo(() => [...new Set(products.flatMap((p) => p.variants.map((v) => v.material)))].sort(), [products]);
   const applications = useMemo(() => [...new Set(products.flatMap((p) => p.applications))].sort(), [products]);
@@ -33,12 +38,19 @@ export default function Category() {
     if (sort === "name") return [...list].sort((a, b) => a.title.localeCompare(b.title));
     return [...list].sort((a, b) => Number(b.featured) - Number(a.featured));
   }, [products, values, sort]);
-  const activeCount = Object.values(values).filter(Boolean).length;
+  // After a filter apply, scroll to the results (never back to the banner):
+  // the top card row and the showing-result text land just below the
+  // sticky header + filter bar, with a gap.
+  useEffect(() => {
+    if (scrollFlag.current) { scrollFlag.current = false; scrollToResults(resultsRef.current); }
+  }, [filtered]);
+  const activeCount = Object.values(values).reduce((n, arr) => n + arr.length, 0);
   const groups = [
     { key: "finish", label: "Finish", options: finishes },
     { key: "material", label: "Material", options: materials },
     { key: "application", label: "Application", options: applications },
   ];
+  const clearAll = () => { scrollFlag.current = true; setValues({ ...EMPTY_VALUES }); };
   return (
     <div>
       <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Products", path: "/products" }, { name: cat.name, path: `/categories/${cat.slug}` }])} />
@@ -56,17 +68,18 @@ export default function Category() {
         sortOptions={SORT_OPTIONS}
         activeCount={activeCount}
         resultText={`${filtered.length} of ${products.length} products`}
-        onValueChange={(key, value) => setValues((v) => ({ ...v, [key]: value }))}
-        onSortChange={setSort}
-        onClearAll={() => setValues({ finish: "", material: "", application: "" })}
-        onApplyDraft={(draft, draftSort) => { setValues({ finish: draft.finish ?? "", material: draft.material ?? "", application: draft.application ?? "" }); setSort(draftSort); }}
+        onValueChange={(key, value) => { scrollFlag.current = true; setValues((v) => ({ ...v, [key]: toggleIn(v[key] ?? [], value) })); }}
+        onSortChange={(value) => { scrollFlag.current = true; setSort(value); }}
+        onClearAll={clearAll}
+        onApplyDraft={(draft, draftSort) => { scrollFlag.current = true; setValues({ finish: draft.finish ?? [], material: draft.material ?? [], application: draft.application ?? [] }); setSort(draftSort); }}
       />
-      <div className="mx-auto w-full max-w-[1440px] px-4 pb-40 pt-8 sm:px-[30px] lg:px-12 lg:pb-10">
+      <div ref={resultsRef} className="mx-auto w-full max-w-[1440px] scroll-mt-[160px] px-4 pb-40 pt-8 sm:px-[30px] lg:scroll-mt-[250px] lg:px-12 lg:pb-10">
+        <p className="mb-6 text-sm text-muted">Showing {filtered.length} of {products.length} products</p>
         {filtered.length === 0 ? (
           <div className="rounded-xl border border-line bg-white p-8 text-center">
             <h2 className="font-serif text-2xl text-navy">No matching products</h2>
             <p className="mt-2 text-muted">Try removing a filter in this category.</p>
-            <button type="button" onClick={() => setValues({ finish: "", material: "", application: "" })} className="mt-4 min-h-11 rounded-lg bg-navy px-4 text-sm font-semibold text-white">Clear filters</button>
+            <button type="button" onClick={clearAll} className="mt-4 min-h-11 rounded-lg bg-navy px-4 text-sm font-semibold text-white">Clear filters</button>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{filtered.map((p) => (<ProductCard key={p.slug} p={p} />))}</div>

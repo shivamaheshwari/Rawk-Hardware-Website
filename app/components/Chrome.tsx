@@ -38,12 +38,6 @@ function FooterWordmark() {
   return <img src={src} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setStage((v) => v + 1)} />;
 }
 
-const USE_AREAS = [
-  ["Door", "/products?application=Doors+%26+Gates"],
-  ["Kitchen", "/products?application=Kitchen+Cabinets"],
-  ["Bathroom", "/products?application=Bathroom+%26+Utility"],
-  ["Wardrobes", "/products?application=Wardrobes"],
-] as const;
 // Mega menu groups as specified by the user (2026-10-25). No group shows
 // more than 6 items. Destinations reuse real catalogue pages only:
 // Categories map to the matching application filter (Curtain has no
@@ -72,6 +66,16 @@ const MENU_BEST_SELLERS = PRODUCTS.filter((p) => p.featured).slice(0, 6);
 export function Header() {
   const [open, setOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => document.documentElement.style.setProperty("--header-height", `${el.offsetHeight}px`);
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("load", update);
+    return () => { window.removeEventListener("resize", update); window.removeEventListener("load", update); };
+  }, []);
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
@@ -81,7 +85,7 @@ export function Header() {
   }, [open]);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
   const closeMega = () => { setMegaOpen(false); megaButtonRef.current?.focus(); };
-  return (<header onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
+  return (<header ref={headerRef} onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
       Hardware for every detail of your home.
     </div>
@@ -183,21 +187,26 @@ function FooterGroup({ title, children }: { title: string; children: ReactNode }
 export function Footer() {
   const year = new Date().getFullYear();
   return (<footer className="bg-[#1d1c19] text-white">
-    <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-10 sm:px-[30px] lg:grid-cols-5 lg:gap-8 lg:px-12">
+    <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-10 sm:px-[30px] lg:grid-cols-6 lg:gap-8 lg:px-12">
       <div>
         <FooterWordmark />
         <p className="mt-2 text-sm leading-relaxed text-white/70">Architectural hardware for modern living. Thoughtfully designed. Built to last.</p>
         <p className="mt-3 text-sm leading-relaxed text-white/80">{BUSINESS.businessName}<br />{BUSINESS.address}<br />Phone: {BUSINESS.phones.join(" / ")}<br />
           <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">Instagram {BUSINESS.instagram}</a></p>
       </div>
-      <FooterGroup title="Company">
-        <ul className="space-y-2 text-sm">{[["About Us", "/about"], ["Contact Us", "/contact"], ["Catalogue", "/catalogue"], ["Guides", "/guides"], ["Privacy", "/privacy"], ["Terms", "/terms"]].map(([l, to]) => (<li key={to}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
+      <FooterGroup title="Shop">
+        <ul className="space-y-2 text-sm">{[["Home", "/"], ["All products", "/products"], ["Best Sellers", "/#best-sellers"], ["Bulk Orders", "/bulk-orders"], ["Catalogue", "/catalogue"], ["Guides", "/guides"], ["FAQs", "/#faqs"]].map(([l, to]) => (<li key={to}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
       </FooterGroup>
       <FooterGroup title="Categories">
-        <ul className="space-y-2 text-sm">{USE_AREAS.map(([l, to]) => (<li key={l}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
+        <ul className="space-y-2 text-sm">{CATEGORIES.map((c) => (<li key={c.slug}><Link className="text-white/80 hover:text-white hover:underline" to={`/categories/${c.slug}`}>{c.name}</Link></li>))}</ul>
+        <p className="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-white/60">Accessories</p>
+        <ul className="space-y-2 text-sm">{MENU_CATEGORIES.map(([l, to]) => (<li key={l}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
       </FooterGroup>
-      <FooterGroup title="Products">
-        <ul className="space-y-2 text-sm">{[["Handles & Pulls", "/categories/handles"], ["Locks", "/categories/locks"], ["Hinges", "/categories/hinges"], ["Hooks & Knobs", "/categories/knobs"]].map(([l, to]) => (<li key={to}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
+      <FooterGroup title="Collections">
+        <ul className="space-y-2 text-sm">{MENU_COLLECTIONS.map(([l, to]) => (<li key={l}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
+      </FooterGroup>
+      <FooterGroup title="Company">
+        <ul className="space-y-2 text-sm">{[["About Us", "/about"], ["Contact Us", "/contact"], ["Privacy", "/privacy"], ["Terms", "/terms"]].map(([l, to]) => (<li key={to}><Link className="text-white/80 hover:text-white hover:underline" to={to}>{l}</Link></li>))}</ul>
       </FooterGroup>
       <div>
         <h3 className="font-semibold">Get in Touch</h3>

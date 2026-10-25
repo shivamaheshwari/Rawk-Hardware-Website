@@ -1,8 +1,13 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { APPLICATIONS, PRODUCTS, allFinishes, allMaterials, filterProducts, searchProducts } from "../data/products";
-export type FilterState = { q: string; category: string; finish: string; material: string; application: string; sort: string };
+/**
+ * Combination filters: each dimension holds MULTIPLE values (repeated URL
+ * params). Within a dimension values OR; across dimensions they AND.
+ */
+export type FilterState = { q: string; category: string[]; finish: string[]; material: string[]; application: string[]; sort: string };
+const DIMS = ["category", "finish", "material", "application"] as const;
 export function parseFilters(url: URL): FilterState {
-  return { q: url.searchParams.get("q") ?? "", category: url.searchParams.get("category") ?? "", finish: url.searchParams.get("finish") ?? "", material: url.searchParams.get("material") ?? "", application: url.searchParams.get("application") ?? "", sort: url.searchParams.get("sort") ?? "featured" };
+  return { q: url.searchParams.get("q") ?? "", category: url.searchParams.getAll("category"), finish: url.searchParams.getAll("finish"), material: url.searchParams.getAll("material"), application: url.searchParams.getAll("application"), sort: url.searchParams.get("sort") ?? "featured" };
 }
 export function applyFilters(f: FilterState) {
   let list = filterProducts(searchProducts(f.q), f);
@@ -17,7 +22,9 @@ export function listingLoader({ request }: LoaderFunctionArgs) {
 export function filterQuery(f: FilterState, patch: Partial<FilterState>): string {
   const p = new URLSearchParams();
   const merged = { ...f, ...patch };
-  (Object.keys(merged) as (keyof FilterState)[]).forEach((k) => { if (merged[k]) p.set(k, merged[k]); });
+  if (merged.q) p.set("q", merged.q);
+  for (const k of DIMS) for (const v of merged[k]) p.append(k, v);
+  if (merged.sort) p.set("sort", merged.sort);
   const s = p.toString(); return s ? `?${s}` : "";
 }
 
