@@ -18,11 +18,28 @@ export function ProductImage({ p, eager = false, contain = false, scaleOnHover =
   return <img src={img.src} alt={img.alt} width={800} height={600} loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} className={`aspect-[4/3] w-full ${hover} ${contain ? "object-contain bg-white" : "object-cover"}`} />;
 }
 
+// Dummy reviews (user request 2026-10-26, listing cards only): the shop
+// has no real ratings yet, so each card shows a stable dummy rating
+// derived from the product slug (same product always shows the same
+// dummy value). These MUST be replaced with real ratings before launch
+// and must never be presented as genuine customer reviews.
+function dummyReview(p: Product): { rating: string; stars: string; count: number } {
+  let h = 0;
+  for (let i = 0; i < p.slug.length; i++) h = (h * 31 + p.slug.charCodeAt(i)) % 1000;
+  const rating = 4.0 + (h % 9) / 10;
+  const filled = Math.round(rating);
+  return { rating: rating.toFixed(1), stars: "★".repeat(filled) + "☆".repeat(5 - filled), count: 25 + (h % 226) };
+}
+
 // mobileListing (user request 2026-10-26, /products + /categories pages
-// only): on mobile the card is a compact horizontal row — image on the
-// left, title + a single "View Item" button on the right, no delivery /
-// wishlist / sponsored text (this site never had those). On tablet and
-// desktop it renders exactly like the standard card above.
+// only): on mobile the card is a full-width horizontal row — image on
+// the left, title + a single "View Item" button on the right, no
+// delivery / wishlist / sponsored text (this site never had those).
+// Round 25 had two such cards per row; round 26 changed the grid to one
+// card per row on mobile, with a wider image. Round 27 made the mobile
+// card bigger with a 40% image / 60% content split, a dummy reviews row
+// and a price line above the View Item button. On tablet and desktop it
+// renders exactly like the standard card above.
 export default function ProductCard({ p, mobileListing = false }: { p: Product; mobileListing?: boolean }) {
   const first = p.variants[0];
   if (!mobileListing) return (
@@ -44,21 +61,23 @@ export default function ProductCard({ p, mobileListing = false }: { p: Product; 
         </div>
       </div>
     </article>);
+  const rev = dummyReview(p);
   return (
     <article className="group flex h-full flex-row overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md sm:flex-col">
-      <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block w-[88px] shrink-0 overflow-hidden sm:w-full"><ProductImage p={p} scaleOnHover={false} /></Link>
-      <div className="flex min-w-0 flex-1 flex-col gap-1 p-3 sm:gap-2 sm:p-4">
+      <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block w-[40%] shrink-0 overflow-hidden sm:w-full"><ProductImage p={p} scaleOnHover={false} /></Link>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-4 sm:gap-2 sm:p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="line-clamp-3 text-[13px] font-semibold leading-snug text-navy sm:text-[15px] sm:line-clamp-none"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
+          <h3 className="line-clamp-3 text-[15px] font-semibold leading-snug text-navy sm:line-clamp-none"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
           {p.status === "preview" && <span className="hidden shrink-0 rounded-full bg-ivory px-2 py-0.5 text-[11px] font-medium text-muted sm:inline-block">Preview</span>}
         </div>
+        <p className="text-sm leading-snug" aria-label={`Dummy rating ${rev.rating} out of 5`}><span className="text-brass" aria-hidden="true">{rev.stars}</span> <span className="font-medium text-navy">{rev.rating}</span> <span className="text-muted">({rev.count})</span></p>
         <p className="hidden text-sm text-muted sm:block">{first?.material ?? "—"}{first?.mounting_centres_mm ? ` · ${first.mounting_centres_mm} mm centres` : ""}{first?.size_label && first.size_label !== "Size to be confirmed from sheet" ? ` · ${first.size_label}` : ""}</p>
         <div className="hidden flex-wrap gap-1.5 sm:flex" aria-label="Finishes">
           {p.finishes.map((f) => (<span key={f} title={f} aria-label={f} className="h-5 w-5 rounded-full border border-line" style={{ background: FINISH_SWATCH[f] ?? "#ccc" }} />))}
         </div>
-        <p className="hidden text-sm font-medium text-navy sm:block">Request current price</p>
+        <p className="text-sm font-medium text-navy">Request current price</p>
         <div className="mt-auto pt-1 sm:hidden">
-          <RawkButton variant="custom" to={`/products/${p.slug}`} className="inline-flex min-h-9 items-center justify-center rounded-full border border-navy bg-navy px-4 text-xs font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy">View Item</RawkButton>
+          <RawkButton variant="custom" to={`/products/${p.slug}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy">View Item</RawkButton>
         </div>
         <div className="mt-auto hidden gap-2 pt-1 sm:flex">
           <RawkButton to={`/products/${p.slug}`} className="flex-1">View Details</RawkButton>
