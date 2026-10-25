@@ -3,10 +3,10 @@ import type { Product } from "../data/products";
 import { FINISH_SWATCH } from "../lib/site";
 import RawkButton from "./RawkButton";
 
-export function ProductImage({ p, eager = false, contain = false, scaleOnHover = true }: { p: Product; eager?: boolean; contain?: boolean; scaleOnHover?: boolean }) {
+export function ProductImage({ p, eager = false, contain = false, scaleOnHover = true, fill = false }: { p: Product; eager?: boolean; contain?: boolean; scaleOnHover?: boolean; fill?: boolean }) {
   const img = p.images[0];
   if (!img) return (
-    <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 bg-navy/90 px-4 text-center" role="img" aria-label={`Preview image for ${p.title} — photo to be added`}>
+    <div className={`flex w-full flex-col items-center justify-center gap-1 bg-navy/90 px-4 text-center ${fill ? "h-full sm:aspect-[4/3] sm:h-auto" : "aspect-[4/3]"}`} role="img" aria-label={`Preview image for ${p.title} — photo to be added`}>
       <span className="font-serif text-2xl text-white">RAWK</span>
       <span className="text-xs font-medium text-white/80">{p.title}</span>
       <span className="text-[11px] text-white/60">Preview image — photo to be added</span>
@@ -14,8 +14,13 @@ export function ProductImage({ p, eager = false, contain = false, scaleOnHover =
   // Image hover: scale 1.1, then scale back, inside an overflow-hidden
   // wrapper (the wrapper lives in the card, not here, so this img can also
   // be reused standalone). Width/height reserve space to avoid layout shift.
+  // fill (mobile listing cards, user request 2026-10-26): the image covers
+  // its whole 40% column — full width AND full card height, cropped with
+  // object-cover — instead of the 4:3 box. On tablet/desktop it returns
+  // to the 4:3 box.
   const hover = scaleOnHover ? "transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transform-none" : "";
-  return <img src={img.src} alt={img.alt} width={800} height={600} loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} className={`aspect-[4/3] w-full ${hover} ${contain ? "object-contain bg-white" : "object-cover"}`} />;
+  const sizing = fill ? "h-full w-full object-cover sm:aspect-[4/3] sm:h-auto" : `aspect-[4/3] w-full ${contain ? "object-contain bg-white" : "object-cover"}`;
+  return <img src={img.src} alt={img.alt} width={800} height={600} loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} className={`${sizing} ${hover}`} />;
 }
 
 // Dummy reviews (user request 2026-10-26, listing cards only): the shop
@@ -64,7 +69,7 @@ export default function ProductCard({ p, mobileListing = false }: { p: Product; 
   const rev = dummyReview(p);
   return (
     <article className="group flex h-full flex-row overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md sm:flex-col">
-      <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block w-[40%] shrink-0 overflow-hidden sm:w-full"><ProductImage p={p} scaleOnHover={false} /></Link>
+      <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block w-[40%] shrink-0 overflow-hidden sm:w-full"><ProductImage p={p} scaleOnHover={false} fill /></Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-4 sm:gap-2 sm:p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="line-clamp-3 text-[15px] font-semibold leading-snug text-navy sm:line-clamp-none"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
