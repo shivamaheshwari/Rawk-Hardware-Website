@@ -67,7 +67,6 @@ export default function Category() {
         sort={sort}
         sortOptions={SORT_OPTIONS}
         activeCount={activeCount}
-        resultText={`${filtered.length} of ${products.length} products`}
         onValueChange={(key, value) => { scrollFlag.current = true; setValues((v) => ({ ...v, [key]: toggleIn(v[key] ?? [], value) })); }}
         onSortChange={(value) => { scrollFlag.current = true; setSort(value); }}
         onClearAll={clearAll}

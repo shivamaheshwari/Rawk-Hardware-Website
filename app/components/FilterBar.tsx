@@ -46,7 +46,6 @@ type FilterBarProps = {
   sort: string;
   sortOptions: { value: string; label: string }[];
   activeCount: number;
-  resultText: string;
   search?: { value: string; placeholder?: string };
   onValueChange: (key: string, value: string) => void;
   onSortChange: (value: string) => void;
@@ -71,7 +70,7 @@ function ToggleIcon({ open }: { open: boolean }) {
 const toggleIn = (arr: string[], value: string) => (arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
 
 export default function FilterBar({
-  groups, values, sort, sortOptions, activeCount, resultText, search,
+  groups, values, sort, sortOptions, activeCount, search,
   onValueChange, onSortChange, onClearAll, onSearch, onApplyDraft,
 }: FilterBarProps) {
   const [expanded, setExpanded] = useState(true);
@@ -110,23 +109,8 @@ export default function FilterBar({
             <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-11 items-center gap-2 text-sm font-bold uppercase tracking-wide text-navy">
               Filters <ToggleIcon open={expanded} />
             </button>
-            {search && onSearch && (
-              <form
-                className="flex min-w-0 flex-1"
-                onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); onSearch(String(fd.get("q") ?? "")); }}
-              >
-                <label htmlFor="filter-search" className="sr-only">Search products</label>
-                <input id="filter-search" name="q" defaultValue={search.value} placeholder={search.placeholder ?? "Search products…"} className="min-h-11 w-full min-w-0 max-w-xs rounded-lg border border-line bg-white px-3 text-[15px]" />
-              </form>
-            )}
-            <label className="ml-auto flex items-center gap-2 text-sm text-navy">
-              <span className="text-muted">Sort By:</span>
-              <select value={sort} onChange={(e) => onSortChange(e.target.value)} className="min-h-11 rounded-lg border border-line bg-white px-2 font-bold text-navy">
-                {sortOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
-              </select>
-            </label>
             {activeCount > 0 && (
-              <button type="button" onClick={onClearAll} className="min-h-11 text-sm font-bold text-navy underline">Clear All ({activeCount})</button>
+              <button type="button" onClick={onClearAll} className="ml-auto min-h-11 text-sm font-bold text-navy underline">Clear All ({activeCount})</button>
             )}
           </div>
           {expanded && (
@@ -143,7 +127,12 @@ export default function FilterBar({
                   </button>
                 );
               })}
-              <span className="ml-auto text-sm text-muted">{resultText}</span>
+              <label className="ml-auto flex items-center gap-2 text-sm text-navy">
+                <span className="text-muted">Sort By:</span>
+                <select value={sort} onChange={(e) => onSortChange(e.target.value)} className="min-h-11 rounded-lg border border-line bg-white px-2 font-bold text-navy">
+                  {sortOptions.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+                </select>
+              </label>
             </div>
           )}
           {expanded && openGroupDef && (

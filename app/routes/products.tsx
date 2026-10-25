@@ -53,7 +53,6 @@ export default function Products() {
         sort={filters.sort}
         sortOptions={SORT_OPTIONS}
         activeCount={activeCount}
-        resultText={`${products.length} of ${total} products`}
         search={{ value: filters.q, placeholder: "Title, SKU…" }}
         onValueChange={(key, value) => go({ [key]: toggleIn(filters[key as "category" | "finish" | "material" | "application"], value) } as Partial<FilterState>)}
         onSortChange={(value) => go({ sort: value })}
