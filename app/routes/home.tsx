@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, type MetaFunction } from "react-router";
 import type { Swiper as SwiperType } from "swiper";
-import { CATEGORIES, PRODUCTS, type Product } from "../data/products";
+import { PRODUCTS, type Product } from "../data/products";
 import { BUSINESS, whatsappUrl } from "../lib/site";
 import { canonical, orgJsonLd, breadcrumbJsonLd } from "../lib/seo";
 import { ProductImage } from "../components/ProductCard";
@@ -62,16 +62,16 @@ function HeroSlide({ slide, isFirst }: { slide: (typeof HERO_SLIDES)[number]; is
     <div className="grid bg-white lg:grid-cols-2">
       <div className="order-2 flex flex-col justify-center px-6 py-10 sm:px-10 lg:order-1 lg:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brass">{slide.eyebrow}</p>
-        <Heading className="mt-3 font-serif text-4xl leading-[1.05] text-navy sm:text-5xl lg:text-6xl">{slide.heading}</Heading>
+        <Heading className="mt-3 font-condensed text-4xl font-black leading-[1.05] text-navy sm:text-5xl lg:text-6xl">{slide.heading}</Heading>
         <p className="mt-4 max-w-md text-base leading-relaxed text-muted sm:text-lg">{slide.copy}</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <RawkButton to={slide.cta.to} arrow>{slide.cta.label}</RawkButton>
           <RawkButton to={slide.secondary.to} variant="secondary">{slide.secondary.label}</RawkButton>
         </div>
       </div>
-      <div className="group order-1 overflow-hidden lg:order-2">
-        <Link to={`/products/${p.slug}`} aria-label={`View ${p.title}`}>
-          <ProductImage p={p} eager={isFirst} />
+      <div className="order-1 overflow-hidden lg:order-2">
+        <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`}>
+          <ProductImage p={p} eager={isFirst} scaleOnHover={false} />
         </Link>
       </div>
     </div>
@@ -87,11 +87,11 @@ function BestsellerCard({ p }: { p: Product }) {
   ].filter(Boolean).join(" · ");
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md">
-      <Link to={`/products/${p.slug}`} aria-label={`View ${p.title}`} className="block overflow-hidden bg-white">
-        <ProductImage p={p} contain />
+      <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block overflow-hidden bg-white">
+        <ProductImage p={p} />
       </Link>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="text-[15px] font-semibold leading-snug text-navy"><Link to={`/products/${p.slug}`}>{p.title}</Link></h3>
+        <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-navy"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
         {detail && <p className="text-sm text-muted">{detail}</p>}
         <p className="text-sm font-medium text-navy">Request current price</p>
         <div className="mt-auto pt-3">
@@ -103,9 +103,11 @@ function BestsellerCard({ p }: { p: Product }) {
 }
 
 export default function Home() {
-  // Bestsellers = featured products that actually have a real photo.
-  // Preview-only featured rows (no photo) are not passed off as bestsellers.
-  const bestsellers = PRODUCTS.filter((p) => p.featured && p.images.length > 0).slice(0, 5);
+  // Bestsellers: first 20 products, so desktop shows 4 at a time and the
+  // page dots are exactly 5 (20 / 4). Products without a real photo yet
+  // show the labelled placeholder panel — never a fake photo.
+  const bestsellers = PRODUCTS.slice(0, 20);
+  const [visibleCount, setVisibleCount] = useState(6);
   const bulkImage = PRODUCTS.find((p) => p.slug === "509-handle")!;
   const [heroSwiper, setHeroSwiper] = useState<SwiperType | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
@@ -124,7 +126,7 @@ export default function Home() {
     <JsonLd data={orgJsonLd()} /><JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }])} />
 
     {/* 1 — Hero slider */}
-    <section aria-label="Featured hardware" className="mx-auto w-full max-w-[1440px] px-4 pt-6 sm:px-8 lg:px-12">
+    <section aria-label="Featured hardware" className="w-full">
       <RawkSwiper
         label="Featured hardware"
         perView={{ mobile: 1, tablet: 1, desktop: 1 }}
@@ -133,6 +135,7 @@ export default function Home() {
         loop
         showArrows={false}
         showDots={false}
+        pauseOnHover={false}
         paused={heroPaused}
         onSwiper={setHeroSwiper}
         onActiveChange={setHeroIndex}
@@ -140,9 +143,9 @@ export default function Home() {
       >
         {HERO_SLIDES.map((s, i) => (<HeroSlide key={s.slug} slide={s} isFirst={i === 0} />))}
       </RawkSwiper>
-      <div className="mt-4 flex items-center gap-4">
-        <button type="button" onClick={() => heroSwiper?.slidePrev()} aria-label="Previous slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white">←</button>
-        <button type="button" onClick={() => heroSwiper?.slideNext()} aria-label="Next slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white">→</button>
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-4 px-4 pt-4 sm:px-[30px] lg:px-12">
+        <button type="button" onClick={() => heroSwiper?.slidePrev()} aria-label="Previous slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px] rotate-180" /></button>
+        <button type="button" onClick={() => heroSwiper?.slideNext()} aria-label="Next slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
         <span className="text-sm font-medium tabular-nums text-muted" aria-live="polite">{String(heroIndex + 1).padStart(2, "0")} / {String(HERO_SLIDES.length).padStart(2, "0")}</span>
         <div className="h-0.5 flex-1 overflow-hidden rounded bg-line" role="progressbar" aria-label="Slide autoplay progress" aria-valuenow={Math.round(heroProgress * 100)} aria-valuemin={0} aria-valuemax={100}>
           <div ref={progressRef} className="h-full bg-brass transition-[width] duration-200" style={{ width: `${Math.round(heroProgress * 100)}%` }} />
@@ -156,31 +159,60 @@ export default function Home() {
     {/* 2 — Marketplace marquee */}
     <div className="mt-12 lg:mt-16"><MarketplaceMarquee /></div>
 
-    {/* 3 — Collections (the 6 real categories; no empty collection invented) */}
+    {/* 3 — Collections: 8 tiles — 7 categories + View All as the last tile.
+        Curtain has no curtain-specific application in the catalogue yet, so
+        it links to all products until curtain data is added; every other
+        tile links to a real category or use-area. Hooks & Knobs stays in
+        the mega menu and footer Products list. */}
     <Section eyebrow="Collections" title="Explore Our Collections" action={<RawkButton to="/products" variant="secondary">View all collections</RawkButton>}>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {CATEGORIES.map((c) => (
-          <Link key={c.slug} to={`/categories/${c.slug}`} className="group overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md">
+        {[
+          { name: "Handles & Pulls", to: "/categories/handles", image: "/images/509-handle-overview.jpg", alt: "RAWK 509 cabinet handle in Golden White" },
+          { name: "Locks", to: "/categories/locks", image: null, alt: "" },
+          { name: "Hinges", to: "/categories/hinges", image: null, alt: "" },
+          { name: "Door Accessories", to: "/products?application=Doors+%26+Gates", image: null, alt: "" },
+          { name: "Curtain Accessories", to: "/products", image: null, alt: "" },
+          { name: "Kitchen Accessories", to: "/products?application=Kitchen+Cabinets", image: null, alt: "" },
+          { name: "Bathroom Accessories", to: "/products?application=Bathroom+%26+Utility", image: null, alt: "" },
+        ].map((c) => (
+          <Link key={c.name} to={c.to} prefetch="intent" className="group overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md">
             <span className="block overflow-hidden">
-              {c.image ? <img src={c.image} alt={c.imageAlt ?? c.name} width={400} height={300} loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transform-none" />
-                : <span className="flex aspect-[4/3] items-center justify-center bg-ivory px-2 text-center text-sm font-semibold text-navy">{c.name}</span>}
+              {c.image ? <img src={c.image} alt={c.alt} width={400} height={300} loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transform-none" />
+                : <span className="flex aspect-[4/3] items-center justify-center bg-ivory px-2 text-center text-sm font-bold text-navy">{c.name}</span>}
             </span>
-            <span className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-navy">{c.name}<span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">→</span></span>
+            <span className="flex items-center justify-between px-4 py-3 text-sm font-bold text-navy">{c.name}<img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={16} height={16} className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" /></span>
           </Link>
         ))}
+        <Link to="/products" prefetch="intent" className="group flex aspect-[4/3] flex-col items-center justify-center gap-2 overflow-hidden rounded border border-navy bg-navy text-white transition-shadow duration-300 hover:shadow-md">
+          <span className="text-base font-bold">View All</span>
+          <img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 invert transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
       </div>
     </Section>
 
-    {/* 4 — Best sellers */}
+    {/* 4 — Best sellers: desktop slider (4 at a time, 1s smooth autoplay,
+        arrows removed, page dots only) + tablet/mobile grid with Load More. */}
     <Section id="best-sellers" eyebrow="Best Sellers" title="Our Best Sellers" action={<RawkButton to="/products" variant="secondary">View all products</RawkButton>}>
-      <RawkSwiper label="Best sellers" perView={{ mobile: 2, tablet: 2, desktop: 4 }} spaceBetween={16}>
-        {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
-      </RawkSwiper>
+      <div className="hidden lg:block">
+        <RawkSwiper label="Best sellers" perView={{ mobile: 4, tablet: 4, desktop: 4 }} spaceBetween={16} autoplay autoplayMs={1000} speed={1000} loop usePagination showArrows={false} showDots={false}>
+          {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
+        </RawkSwiper>
+      </div>
+      <div className="lg:hidden">
+        <div className="grid grid-cols-2 gap-4">
+          {bestsellers.slice(0, visibleCount).map((p) => (<BestsellerCard key={p.slug} p={p} />))}
+        </div>
+        {visibleCount < bestsellers.length && (
+          <div className="mt-6 flex justify-center">
+            <RawkButton onClick={() => setVisibleCount((v) => Math.min(bestsellers.length, v + 4))}>Load More</RawkButton>
+          </div>
+        )}
+      </div>
     </Section>
 
     {/* 5 — Bulk-order banner */}
-    <section className="mx-auto w-full max-w-[1440px] px-4 sm:px-8 lg:px-12">
-      <div className="grid overflow-hidden rounded bg-[#1d1c19] text-white lg:grid-cols-2">
+    <section className="mx-auto w-full max-w-[1440px] px-0 sm:px-[30px] lg:px-12">
+      <div className="grid overflow-hidden rounded-none bg-[#1d1c19] text-white sm:rounded lg:grid-cols-2">
         <div className="px-6 py-10 sm:px-10 lg:py-14">
           <h2 className="font-serif text-3xl leading-tight sm:text-4xl">Big projects. Better partnerships.</h2>
           <p className="mt-3 max-w-md text-white/80">For dealers, retailers and project requirements.</p>
@@ -208,7 +240,7 @@ export default function Home() {
       </RawkSwiper>
     </Section>
 
-    <section className="mx-auto w-full max-w-[1440px] px-4 pb-12 sm:px-8 lg:px-12">
+    <section className="mx-auto w-full max-w-[1440px] px-4 pb-12 sm:px-[30px] lg:px-12">
       <div className="rounded border border-line bg-white p-5 text-sm text-muted">
         <strong className="text-navy">{BUSINESS.businessName}</strong> — {BUSINESS.address}. Phone: {BUSINESS.phones.join(" / ")}. Instagram: <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">{BUSINESS.instagram}</a>. Enquire on WhatsApp: <a className="underline" href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" rel="noreferrer">message the shop</a>.
       </div>

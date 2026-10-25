@@ -1,8 +1,9 @@
 import { Children, useEffect, useRef, useState, type ReactNode } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Autoplay, Keyboard } from "swiper/modules";
+import { A11y, Autoplay, Keyboard, Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
+import "swiper/css/pagination";
 
 /**
  * Common client-side Swiper slider.
@@ -27,6 +28,12 @@ export type RawkSwiperProps = {
   loop?: boolean;
   showArrows?: boolean;
   showDots?: boolean;
+  /** Swiper's own page dots (one per slidesPerGroup page, not per slide). */
+  usePagination?: boolean;
+  /** Hero: false — autoplay must keep running on hover. Default true. */
+  pauseOnHover?: boolean;
+  /** Transition duration in ms (best sellers: smooth 1000ms). */
+  speed?: number;
   className?: string;
   /** Set by a caller-owned pause/play control (hero). Hover/focus pauses never override it. */
   paused?: boolean;
@@ -45,6 +52,9 @@ export default function RawkSwiper({
   loop = false,
   showArrows = true,
   showDots = true,
+  usePagination = false,
+  pauseOnHover = true,
+  speed = 500,
   className = "",
   paused = false,
   onSwiper,
@@ -82,9 +92,9 @@ export default function RawkSwiper({
     return () => obs.disconnect();
   }, [mounted, autoplay]);
 
-  const pause = () => swiperRef.current?.autoplay?.stop();
+  const pause = () => { if (pauseOnHover) swiperRef.current?.autoplay?.stop(); };
   const resume = () => {
-    if (autoplay && !reducedMotion && !pausedRef.current) swiperRef.current?.autoplay?.start();
+    if (pauseOnHover && autoplay && !reducedMotion && !pausedRef.current) swiperRef.current?.autoplay?.start();
   };
 
   if (!mounted || slides.length === 0) {
@@ -117,20 +127,23 @@ export default function RawkSwiper({
       onBlur={resume}
     >
       <Swiper
-        modules={[A11y, Autoplay, Keyboard]}
+        modules={[A11y, Autoplay, Keyboard, Pagination]}
         a11y={{ enabled: true, containerMessage: label }}
         keyboard={{ enabled: true }}
+        speed={speed}
         autoplay={
           autoplay && !reducedMotion
-            ? { delay: autoplayMs, disableOnInteraction: false, pauseOnMouseEnter: true }
+            ? { delay: autoplayMs, disableOnInteraction: false, pauseOnMouseEnter: pauseOnHover }
             : false
         }
+        pagination={usePagination ? { clickable: true } : false}
         loop={loop}
         spaceBetween={spaceBetween}
         slidesPerView={perView.mobile}
+        slidesPerGroup={perView.mobile}
         breakpoints={{
-          768: { slidesPerView: perView.tablet },
-          1024: { slidesPerView: perView.desktop },
+          768: { slidesPerView: perView.tablet, slidesPerGroup: perView.tablet },
+          1024: { slidesPerView: perView.desktop, slidesPerGroup: perView.desktop },
         }}
         onSwiper={handleSwiper}
         onSlideChange={handleChange}

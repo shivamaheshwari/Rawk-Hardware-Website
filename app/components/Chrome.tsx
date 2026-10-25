@@ -7,13 +7,25 @@ import RawkButton from "./RawkButton";
 export const EnquiryContext = createContext<{ message: string; setMessage: (m: string) => void }>({ message: "Hello, I would like to enquire about RAWK hardware products.", setMessage: () => {} });
 export const useEnquiry = () => useContext(EnquiryContext);
 
-// No official logo file exists in public/ — the text wordmark is kept, as
-// before, rather than redrawing the logo from the generated mockup.
+// Logos: user-supplied Google Drive files. Black logo on the light header,
+// white logo on the dark footer. If Drive ever fails to load, fall back to
+// the text wordmark so the header never shows a broken image.
+const LOGO_BLACK = "https://drive.google.com/thumbnail?id=1g08wSEhpqE_LKLDndnMb_pei13XZDTRF&sz=w200";
+const LOGO_WHITE = "https://drive.google.com/thumbnail?id=1poseI903UQVoSMTAvNZBtjLnBUFsryeJ&sz=w200";
 function Wordmark() {
+  const [failed, setFailed] = useState(false);
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
-    <span className="font-serif text-[28px] tracking-wide text-navy">RAWK</span>
-    <span className="text-[11px] font-medium tracking-wide text-muted">Hardware by Vinayak Enterprise</span>
+    {failed
+      ? <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>
+      : <img src={LOGO_BLACK} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setFailed(true)} />}
+    <span className="text-[11px] font-bold tracking-[0.15em] text-muted" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>We Believe in Quality</span>
   </Link>);
+}
+function FooterWordmark() {
+  const [failed, setFailed] = useState(false);
+  return failed
+    ? <p className="font-serif text-3xl font-bold">RAWK</p>
+    : <img src={LOGO_WHITE} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setFailed(true)} />;
 }
 
 const USE_AREAS = [
@@ -35,12 +47,12 @@ export function Header() {
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
       Hardware for every detail of your home.
     </div>
-    <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-8 lg:px-12">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-[30px] lg:px-12">
       <Wordmark />
-      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-medium text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>☰ Menu</button>
+      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>☰ Menu</button>
       <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
         <div onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)} className="relative">
-          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-medium text-navy">
+          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
             Collections <span aria-hidden>{megaOpen ? "▴" : "▾"}</span>
           </button>
           {megaOpen && (
@@ -49,13 +61,13 @@ export function Header() {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">By product type</p>
                   <ul className="mt-3 space-y-2">
-                    {CATEGORIES.map((c) => (<li key={c.slug}><Link to={`/categories/${c.slug}`} onClick={() => setMegaOpen(false)} className="text-[15px] font-medium text-navy hover:text-brass">{c.name}</Link></li>))}
+                    {CATEGORIES.map((c) => (<li key={c.slug}><Link to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{c.name}</Link></li>))}
                   </ul>
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">By use area</p>
                   <ul className="mt-3 space-y-2">
-                    {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} onClick={() => setMegaOpen(false)} className="text-[15px] font-medium text-navy hover:text-brass">{label}</Link></li>))}
+                    {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] font-bold text-navy hover:text-brass">{label}</Link></li>))}
                   </ul>
                 </div>
               </div>
@@ -66,36 +78,35 @@ export function Header() {
             </div>
           )}
         </div>
-        <Link to="/#best-sellers" className="text-[15px] font-medium text-navy">Best Sellers</Link>
-        <NavLink to="/about" className={({ isActive }) => `text-[15px] font-medium ${isActive ? "text-brass" : "text-navy"}`}>About Us</NavLink>
-        <NavLink to="/contact" className={({ isActive }) => `text-[15px] font-medium ${isActive ? "text-brass" : "text-navy"}`}>Contact</NavLink>
+        <Link to="/#best-sellers" prefetch="intent" className="text-[15px] font-bold text-navy">Best Sellers</Link>
+        <NavLink to="/about" prefetch="intent" className={({ isActive }) => `text-[15px] font-bold ${isActive ? "text-brass" : "text-navy"}`}>About Us</NavLink>
+        <NavLink to="/contact" prefetch="intent" className={({ isActive }) => `text-[15px] font-bold ${isActive ? "text-brass" : "text-navy"}`}>Contact</NavLink>
       </nav>
-      <div className="order-3 w-full lg:order-none lg:ml-auto lg:w-auto">
+      <div className="order-3 hidden w-full lg:order-none lg:ml-auto lg:block lg:w-auto">
         <Form method="get" action="/products" role="search" className="flex">
           <label htmlFor="site-search" className="sr-only">Search products</label>
           <input id="site-search" name="q" type="search" placeholder="Search handles, locks, hinges…" className="min-h-11 w-full min-w-0 rounded-l border border-line bg-white px-3 text-[15px] lg:w-64" />
           <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#33312e]">Search</RawkButton>
         </Form>
       </div>
-      <RawkButton href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="order-4 hidden lg:inline-flex">WhatsApp Enquiry</RawkButton>
+      <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="order-4 hidden lg:inline-flex">WhatsApp Enquiry</RawkButton>
     </div>
     {open && (<nav id="mobile-menu" aria-label="Mobile" className="border-t border-line bg-white px-4 py-3 lg:hidden">
       <p className="py-2 text-xs font-semibold uppercase tracking-wide text-muted">Collections</p>
-      {CATEGORIES.map((c) => (<Link key={c.slug} to={`/categories/${c.slug}`} onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-medium text-navy">{c.name}</Link>))}
+      {CATEGORIES.map((c) => (<Link key={c.slug} to={`/categories/${c.slug}`} onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy">{c.name}</Link>))}
       {[["Best Sellers", "/#best-sellers"], ["All products", "/products"], ["About Us", "/about"], ["Bulk Orders", "/bulk-orders"], ["Guides", "/guides"], ["Contact", "/contact"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
-        <Link key={to} to={to} onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-medium text-navy last:border-0">{label}</Link>))}
-      <RawkButton href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-3 w-full">WhatsApp Enquiry</RawkButton>
+        <Link key={to} to={to} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
     </nav>)}
   </header>);
 }
 
 function FooterGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <details className="footer-group border-b border-white/15 py-3 lg:border-0 lg:py-0">
+    <details className="footer-group border-b border-white/15 py-2 lg:border-0 lg:py-0">
       <summary className="flex cursor-pointer list-none items-center justify-between font-semibold lg:cursor-default">
         {title}<span aria-hidden className="footer-chevron lg:hidden">▾</span>
       </summary>
-      <div className="mt-3">{children}</div>
+      <div className="mt-2">{children}</div>
     </details>
   );
 }
@@ -103,9 +114,9 @@ function FooterGroup({ title, children }: { title: string; children: ReactNode }
 export function Footer() {
   const year = new Date().getFullYear();
   return (<footer className="bg-[#1d1c19] text-white">
-    <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-4 py-10 sm:px-8 lg:grid-cols-5 lg:px-12">
+    <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-4 py-10 sm:px-[30px] lg:grid-cols-5 lg:gap-8 lg:px-12">
       <div>
-        <p className="font-serif text-3xl">RAWK</p>
+        <FooterWordmark />
         <p className="mt-2 text-sm leading-relaxed text-white/70">Architectural hardware for modern living. Thoughtfully designed. Built to last.</p>
         <p className="mt-3 text-sm leading-relaxed text-white/80">{BUSINESS.businessName}<br />{BUSINESS.address}<br />Phone: {BUSINESS.phones.join(" / ")}<br />
           <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">Instagram {BUSINESS.instagram}</a></p>
@@ -122,15 +133,15 @@ export function Footer() {
       <div>
         <h3 className="font-semibold">Get in Touch</h3>
         <p className="mt-3 text-sm leading-relaxed text-white/80">Quick support for product enquiries, bulk orders and project requirements.</p>
-        <RawkButton href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-3">WhatsApp Enquiry</RawkButton>
+        <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="mt-3">WhatsApp Enquiry</RawkButton>
       </div>
     </div>
     <div className="border-t border-white/15">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-between gap-4 px-4 py-6 sm:px-8 lg:flex-row lg:items-center lg:px-12">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start justify-between gap-4 px-4 py-6 sm:px-[30px] lg:flex-row lg:items-center lg:px-12">
         <p className="font-serif text-xl">Let&apos;s find the right hardware for your space.</p>
         <RawkButton to="/contact" variant="onDark" arrow>Talk to Our Team</RawkButton>
       </div>
-      <p className="border-t border-white/15 px-4 py-4 text-center text-xs text-white/60">© {year} RAWK — Hardware by Vinayak Enterprise. Product specifications shown are as supplied; preview items are marked and must be confirmed before launch.</p>
+      <p className="border-t border-white/15 px-4 py-4 text-center text-xs text-white/60">© {year} RAWK — We Believe in Quality. Product specifications shown are as supplied; preview items are marked and must be confirmed before launch.</p>
     </div>
   </footer>);
 }
@@ -139,8 +150,8 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="sticky bottom-0 z-40 flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 lg:hidden">
-    <RawkButton variant="whatsapp" href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
+  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 lg:hidden">
+    <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
     <RawkButton to="/bulk-orders" className="flex-1">Bulk Quote</RawkButton>
   </div>);
 }

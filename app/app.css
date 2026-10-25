@@ -3,10 +3,14 @@
   /* Design.md tokens: warm ivory, charcoal primary, sparing brass accent. */
   --color-navy: #22211e; --color-ivory: #faf8f3; --color-brass: #a47a3c;
   --color-body: #2e2b26; --color-muted: #66625b; --color-line: #e5e0d7; --color-wa: #176b42;
-  --font-serif: "DM Serif Display", Georgia, serif; --font-sans: Inter, system-ui, sans-serif;
+  /* Font table: headings, nav, buttons, product names and body = Lato
+     (headings/nav/buttons Bold 700, body Regular 400); hero heading =
+     Roboto Condensed Bold 700-900 via --font-condensed. */
+  --font-serif: "Lato", Arial, sans-serif; --font-sans: "Lato", Arial, sans-serif;
+  --font-condensed: "Roboto Condensed", "Lato", Arial, sans-serif;
 }
 html { scroll-behavior: smooth; }
-body { background: #faf8f3; color: #2e2b26; font-family: Inter, system-ui, sans-serif; }
+body { background: #faf8f3; color: #2e2b26; font-family: "Lato", Arial, sans-serif; font-weight: 400; }
 a, button { -webkit-tap-highlight-color: transparent; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #a47a3c; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
@@ -30,5 +34,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .footer-group summary .footer-chevron { display: none; }
 }
 
-/* Swiper: keep the default pagination invisible — RawkSwiper renders its own dots. */
+/* Swiper pagination (best sellers): dots below the slider, one per page. */
 .swiper { overflow: hidden; }
+.swiper-pagination { position: relative; margin-top: 16px; display: flex; justify-content: center; gap: 6px; }
+.swiper-pagination-bullet { width: 10px; height: 10px; margin: 0 !important; background: #e5e0d7; opacity: 1; transition: all 300ms; }
+.swiper-pagination-bullet-active { width: 24px; border-radius: 9999px; background: #a47a3c; }

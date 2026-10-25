@@ -1,6 +1,6 @@
 export const BUSINESS = {
   brand: "RAWK",
-  descriptor: "Hardware by Vinayak Enterprise",
+  descriptor: "We Believe in Quality",
   businessName: "Vinayak Enterprises",
   address: "Opposite UCO Bank, Daulatganj, Lashkar, Gwalior (M.P.) 474001",
   phones: ["9589133387", "8962636662"],

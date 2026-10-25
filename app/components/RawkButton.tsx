@@ -33,11 +33,14 @@ export type RawkButtonProps = {
   className?: string;
   ariaLabel?: string;
   arrow?: boolean;
+  /** Show the uploaded WhatsApp logo before the label (WhatsApp actions). */
+  whatsappIcon?: boolean;
   children: ReactNode;
 };
 
+// Navigation / buttons use Lato Bold 700 (font table).
 const BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded px-5 text-sm font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded px-5 text-sm font-bold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:opacity-50";
 
 const VARIANTS: Record<Exclude<RawkButtonVariant, "custom">, string> = {
   // Charcoal button, ivory text — the shared default (header, mega menu, footer).
@@ -52,8 +55,8 @@ const VARIANTS: Record<Exclude<RawkButtonVariant, "custom">, string> = {
   // Ivory outline on a dark surface.
   onDarkSecondary:
     "border border-white/60 bg-transparent text-white hover:-translate-y-px hover:bg-white hover:text-navy hover:shadow-md active:translate-y-0",
-  // Kept only where WhatsApp is the action itself (mobile bar, product page);
-  // the header/footer "WhatsApp Enquiry" CTA uses primary, as in the mockup.
+  // WhatsApp Enquiry: green background, white text, WhatsApp logo
+  // (see whatsappIcon). Used for every WhatsApp action site-wide.
   whatsapp:
     "bg-wa text-white hover:-translate-y-px hover:brightness-110 hover:shadow-md active:translate-y-0",
 };
@@ -70,12 +73,16 @@ export default function RawkButton({
   className = "",
   ariaLabel,
   arrow = false,
+  whatsappIcon = false,
   children,
 }: RawkButtonProps) {
   const classes =
     variant === "custom" ? className : `${BASE} ${VARIANTS[variant]} ${className}`.trim();
   const content = (
     <>
+      {whatsappIcon && (
+        <img src="/icons/whatsapp-symbol-logo.svg" alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 shrink-0" />
+      )}
       {children}
       {arrow && (
         <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5">
@@ -85,8 +92,10 @@ export default function RawkButton({
     </>
   );
   if (to) {
+    // prefetch="intent": hover/focus prefetches the route, so navigation
+    // switching feels instant instead of waiting for a fresh fetch.
     return (
-      <Link to={to} aria-label={ariaLabel} className={classes} onClick={onClick}>
+      <Link to={to} prefetch="intent" aria-label={ariaLabel} className={classes} onClick={onClick}>
         {content}
       </Link>
     );
