@@ -193,18 +193,19 @@ export function Header() {
             <button type="button" onClick={closeMobile} aria-label="Close menu" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent hover:text-navy"><img src="/icons/cross.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
           </div>
           <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-3">
-            {/* Mobile menu only (user request 2026-10-26): Categories and
-                Collections are sorted A–Z by label. The shared CATEGORIES /
-                MENU_COLLECTIONS order is NOT changed, so desktop mega menu,
-                footer and category pages keep their existing order. */}
-            <MobileAccordion title="Categories" items={[...CATEGORIES].sort((a, b) => a.name.localeCompare(b.name)).map((c) => [c.name, `/categories/${c.slug}`] as const)} expanded={mobileSection === "categories"} onToggle={() => setMobileSection(mobileSection === "categories" ? null : "categories")} onNavigate={closeMobile} />
+            {/* Mobile menu only (user request 2026-10-26, round 19):
+                Categories is removed; order is Home, Collections,
+                Company, Products, Best Products. Collections stays
+                sorted A–Z; Company items are in the user's listed
+                order. The shared CATEGORIES / MENU_COLLECTIONS order
+                is NOT changed, so desktop mega menu, footer and
+                category pages keep their existing order. All products
+                and the old Best Sellers / Bulk Orders drawer links are
+                replaced by Products and Best Products here. */}
+            <Link to="/" prefetch="intent" onClick={closeMobile} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy">Home</Link>
             <MobileAccordion title="Collections" items={[...MENU_COLLECTIONS].sort((a, b) => a[0].localeCompare(b[0]))} expanded={mobileSection === "collections"} onToggle={() => setMobileSection(mobileSection === "collections" ? null : "collections")} onNavigate={closeMobile} />
-            {/* Company accordion (user request 2026-10-26): About Us,
-                Contact Us, Guides, Catalogue — in the user's listed order.
-                All products is removed from the mobile menu entirely;
-                Categories and Collections are unchanged. */}
-            <MobileAccordion title="Company" items={[["About Us", "/about"], ["Contact Us", "/contact"], ["Guides", "/guides"], ["Catalogue", "/catalogue"]]} expanded={mobileSection === "company"} onToggle={() => setMobileSection(mobileSection === "company" ? null : "company")} onNavigate={closeMobile} />
-            {[["Best Sellers", "/#best-sellers"], ["Bulk Orders", "/bulk-orders"]].map(([label, to]) => (
+            <MobileAccordion title="Company" items={[["About Us", "/about"], ["Catalogue", "/catalogue"], ["Contact Us", "/contact"], ["Guides", "/guides"]]} expanded={mobileSection === "company"} onToggle={() => setMobileSection(mobileSection === "company" ? null : "company")} onNavigate={closeMobile} />
+            {[["Products", "/products"], ["Best Products", "/#best-sellers"]].map(([label, to]) => (
               <Link key={to} to={to} prefetch="intent" onClick={closeMobile} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
           </nav>
           <div className="flex flex-col gap-3 border-t border-line px-4 py-4">
