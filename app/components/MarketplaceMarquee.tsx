@@ -6,7 +6,9 @@ import RawkSwiper from "./RawkSwiper";
  * Marketplace / social slider — a real Swiper loop (not a CSS marquee):
  * 3 logos on mobile, 4 on tablet, 6 on desktop, looping with autoplay that
  * NEVER stops on interaction: pauseOnHover is false, Swiper's
- * disableOnInteraction is false, and there is no pause button. Logos are
+ * disableOnInteraction is false, and there is no pause button. Since
+ * 2026-10-26 it runs CONTINUOUSLY (autoplay delay 0, faster 1500ms glide)
+ * instead of stepping one logo at a time with a pause. Logos are
  * the PNG files the user uploaded on 2026-10-25 (public/images/marquee/),
  * in the user's order: Amazon, Flipkart, JioMart, Meesho, WhatsApp,
  * Instagram. If a local file is missing (e.g. a deploy built from GitHub
@@ -67,8 +69,8 @@ export default function MarketplaceMarquee() {
           slidesPerGroup={1}
           spaceBetween={40}
           autoplay
-          autoplayMs={2000}
-          speed={1000}
+          autoplayMs={0}
+          speed={1500}
           loop
           pauseOnHover={false}
           showArrows={false}

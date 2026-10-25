@@ -65,13 +65,13 @@ export default function ProductPage() {
         <fieldset className="mt-5"><legend className="font-semibold text-navy">Finish</legend>
           <div className="mt-2 flex flex-wrap gap-2">{p.finishes.map((f) => {
             const disabled = !p.variants.some((v) => v.finish === f);
-            return (<button key={f} type="button" disabled={disabled} onClick={() => setFinish(f)} aria-pressed={finish === f} className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-sm font-medium ${finish === f ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"} disabled:opacity-40`}>
+            return (<button key={f} type="button" disabled={disabled} onClick={() => setFinish(f)} aria-pressed={finish === f} className={`flex min-h-11 items-center gap-2 rounded-full border px-3 text-sm font-semibold ${finish === f ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"} disabled:opacity-40`}>
               <span className="h-4 w-4 rounded-full border border-line" style={{ background: FINISH_SWATCH[f] ?? "#ccc" }} />{f}{disabled ? " (unavailable)" : ""}</button>);
           })}</div></fieldset>
         <fieldset className="mt-4"><legend className="font-semibold text-navy">Size</legend>
-          <div className="mt-2 flex flex-wrap gap-2">{sizes.map((s) => (<button key={s} type="button" onClick={() => setSize(s)} aria-pressed={size === s} className={`min-h-11 rounded-lg border px-3 text-sm font-medium ${size === s ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>{s}</button>))}</div></fieldset>
+          <div className="mt-2 flex flex-wrap gap-2">{sizes.map((s) => (<button key={s} type="button" onClick={() => setSize(s)} aria-pressed={size === s} className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${size === s ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>{s}</button>))}</div></fieldset>
         <fieldset className="mt-4"><legend className="font-semibold text-navy">Pack quantity</legend>
-          <div className="mt-2 flex flex-wrap gap-2">{packs.map((pk) => (<button key={pk} type="button" onClick={() => setPack(pk)} aria-pressed={pack === pk} className={`min-h-11 rounded-lg border px-3 text-sm font-medium ${pack === pk ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>Pack of {pk}</button>))}</div></fieldset>
+          <div className="mt-2 flex flex-wrap gap-2">{packs.map((pk) => (<button key={pk} type="button" onClick={() => setPack(pk)} aria-pressed={pack === pk} className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${pack === pk ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>Pack of {pk}</button>))}</div></fieldset>
         <label className="mt-4 block font-semibold text-navy">Quantity
           <input type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="mt-2 block min-h-11 w-32 rounded-lg border border-line bg-white px-3" /></label>
         <div className="mt-5 flex flex-wrap gap-3">

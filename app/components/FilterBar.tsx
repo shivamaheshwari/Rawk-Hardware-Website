@@ -116,18 +116,18 @@ export default function FilterBar({
       <div className="filter-bar-desktop sticky z-30 hidden border-y border-line bg-white lg:block" style={{ top: "var(--header-height, 104px)" }}>
         <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-[30px] lg:px-12">
           <div className="flex flex-wrap items-center gap-3">
-            <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-11 items-center gap-2 text-sm font-bold uppercase tracking-wide text-navy">
+            <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-11 items-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy">
               Filters <ToggleIcon open={expanded} />
             </button>
           </div>
           {expanded && (
             <div className="flex flex-wrap items-center gap-2 border-t border-line py-3">
-              <button type="button" onClick={onClearAll} className={`min-h-11 rounded-full border px-4 text-sm font-bold transition-colors duration-200 ${activeCount === 0 ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy"}`}>All Products</button>
+              <button type="button" onClick={onClearAll} className={`min-h-11 rounded-full border px-4 text-sm font-semibold transition-colors duration-200 ${activeCount === 0 ? "border-navy bg-navy text-white" : "border-line bg-white text-navy hover:border-navy hover:bg-transparent"}`}>All Products</button>
               {groups.map((g) => {
                 const count = values[g.key]?.length ?? 0;
                 const open = openGroup === g.key;
                 return (
-                  <button key={g.key} type="button" onClick={() => setOpenGroup(open ? null : g.key)} aria-expanded={open} className={`flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-bold transition-colors duration-200 ${open || count > 0 ? "border-navy bg-ivory text-navy" : "border-line bg-white text-navy hover:border-navy"}`}>
+                  <button key={g.key} type="button" onClick={() => setOpenGroup(open ? null : g.key)} aria-expanded={open} className={`flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors duration-200 ${open || count > 0 ? "border-navy bg-ivory text-navy" : "border-line bg-white text-navy hover:border-navy hover:bg-transparent"}`}>
                     {g.label}
                     {count > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brass text-[11px] font-bold text-white">{count}</span>}
                     <ToggleIcon open={open} />
@@ -135,7 +135,7 @@ export default function FilterBar({
                 );
               })}
               {activeCount > 0 && (
-                <button type="button" onClick={onClearAll} className="ml-auto min-h-11 text-sm font-bold text-navy underline">Clear All ({activeCount})</button>
+                <button type="button" onClick={onClearAll} className="ml-auto min-h-11 text-sm font-semibold text-navy underline">Clear All ({activeCount})</button>
               )}
             </div>
           )}
@@ -153,11 +153,11 @@ export default function FilterBar({
 
       {/* Mobile/tablet bar: in flow above the cards, sticks under the header */}
       <div className="filter-bar-mobile sticky z-30 flex border-b border-line bg-white lg:hidden" style={{ top: "var(--header-height, 104px)" }}>
-        <button type="button" onClick={() => openDrawer(groups[0]?.key ?? "sort")} className="flex min-h-12 flex-1 items-center justify-center gap-2 border-r border-line text-sm font-bold uppercase tracking-wide text-navy">
+        <button type="button" onClick={() => openDrawer(groups[0]?.key ?? "sort")} className="flex min-h-12 flex-1 items-center justify-center gap-2 border-r border-line text-sm font-semibold uppercase tracking-wide text-navy">
           Filter
           {activeCount > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brass text-[11px] font-bold text-white">{activeCount}</span>}
         </button>
-        <button type="button" onClick={() => openDrawer("sort")} className="flex min-h-12 flex-1 items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide text-navy">Sort</button>
+        <button type="button" onClick={() => openDrawer("sort")} className="flex min-h-12 flex-1 items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-navy">Sort</button>
       </div>
 
       {/* Mobile/tablet filter drawer */}
@@ -165,7 +165,7 @@ export default function FilterBar({
         <div className="fixed inset-0 z-50 flex flex-col bg-white lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <p className="text-sm font-bold uppercase tracking-wide text-navy">Filters</p>
-            <button type="button" onClick={() => { setDraft({}); setDraftSort(sortOptions[0]?.value ?? sort); setDraftSearch(""); }} className="text-sm font-bold text-navy underline">Clear All</button>
+            <button type="button" onClick={() => { setDraft({}); setDraftSort(sortOptions[0]?.value ?? sort); setDraftSearch(""); }} className="text-sm font-semibold text-navy underline">Clear All</button>
           </div>
           {search && (
             <div className="border-b border-line px-4 py-3">
@@ -175,11 +175,11 @@ export default function FilterBar({
           )}
           <div className="grid flex-1 grid-cols-[132px_1fr] overflow-hidden">
             <div className="overflow-y-auto border-r border-line bg-ivory/60">
-              <button type="button" onClick={() => setDrawerGroup("sort")} className={`block w-full border-b border-line px-3 py-3 text-left text-sm font-bold ${drawerGroup === "sort" ? "bg-white text-navy" : "text-muted"}`}>Sort</button>
+              <button type="button" onClick={() => setDrawerGroup("sort")} className={`block w-full border-b border-line px-3 py-3 text-left text-sm font-semibold ${drawerGroup === "sort" ? "bg-white text-navy" : "text-muted"}`}>Sort</button>
               {groups.map((g) => {
                 const count = draft[g.key]?.length ?? 0;
                 return (
-                  <button key={g.key} type="button" onClick={() => setDrawerGroup(g.key)} className={`flex w-full items-center justify-between border-b border-line px-3 py-3 text-left text-sm font-bold ${drawerGroup === g.key ? "bg-white text-navy" : "text-muted"}`}>
+                  <button key={g.key} type="button" onClick={() => setDrawerGroup(g.key)} className={`flex w-full items-center justify-between border-b border-line px-3 py-3 text-left text-sm font-semibold ${drawerGroup === g.key ? "bg-white text-navy" : "text-muted"}`}>
                     {g.label}
                     {count > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brass text-[11px] font-bold text-white">{count}</span>}
                   </button>
@@ -203,7 +203,7 @@ export default function FilterBar({
             </div>
           </div>
           <div className="flex border-t border-line">
-            <button type="button" onClick={() => setDrawerOpen(false)} className="min-h-12 flex-1 border-r border-line text-sm font-bold uppercase tracking-wide text-navy">Close</button>
+            <button type="button" onClick={() => setDrawerOpen(false)} className="min-h-12 flex-1 border-r border-line text-sm font-semibold uppercase tracking-wide text-navy">Close</button>
             <button
               type="button"
               onClick={() => {
@@ -211,7 +211,7 @@ export default function FilterBar({
                 else if (onSearch && search && draftSearch !== search.value) onSearch(draftSearch);
                 setDrawerOpen(false);
               }}
-              className="min-h-12 flex-1 bg-navy text-sm font-bold uppercase tracking-wide text-white"
+              className="min-h-12 flex-1 border border-navy bg-navy text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-transparent hover:text-navy"
             >
               Apply
             </button>

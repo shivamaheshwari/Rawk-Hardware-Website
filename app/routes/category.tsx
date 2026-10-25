@@ -80,7 +80,7 @@ export default function Category() {
           <div className="rounded-xl border border-line bg-white p-8 text-center">
             <h2 className="font-serif text-2xl text-navy">No matching products</h2>
             <p className="mt-2 text-muted">Try removing a filter in this category.</p>
-            <button type="button" onClick={clearAll} className="mt-4 min-h-11 rounded-lg bg-navy px-4 text-sm font-semibold text-white">Clear filters</button>
+            <button type="button" onClick={clearAll} className="mt-4 min-h-11 rounded-full border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors hover:bg-transparent hover:text-navy">Clear filters</button>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{filtered.map((p) => (<ProductCard key={p.slug} p={p} />))}</div>

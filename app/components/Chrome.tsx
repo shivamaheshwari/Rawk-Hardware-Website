@@ -23,7 +23,7 @@ function LogoImg({ local, drive, alt }: { local: string; drive: string; alt: str
   const [stage, setStage] = useState(0);
   if (stage === 2) return <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>;
   const src = stage === 0 ? local : drive;
-  return <img src={src} alt={alt} className="aspect-[2/1] h-[100px] w-auto object-contain" onError={() => setStage((v) => v + 1)} />;
+  return <img src={src} alt={alt} className="aspect-[2/1] h-[50px] w-auto object-contain lg:h-[65px]" onError={() => setStage((v) => v + 1)} />;
 }
 function Wordmark() {
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
@@ -58,13 +58,31 @@ const MENU_COLLECTIONS = [
   ["Towel hangers", "/products?application=Bathroom+%26+Utility"],
 ] as const;
 const MENU_BEST_SELLERS = PRODUCTS.filter((p) => p.featured).slice(0, 6);
+
+// Mobile sidebar accordion (user request 2026-10-26, test plan NAV-09/10):
+// a section header with a plus/minus indicator; its children appear only
+// while expanded, and tapping a child closes the whole drawer.
+function MobileAccordion({ title, items, expanded, onToggle, onNavigate }: { title: string; items: readonly (readonly [string, string])[]; expanded: boolean; onToggle: () => void; onNavigate: () => void }) {
+  return (<div className="border-b border-line">
+    <button type="button" aria-expanded={expanded} onClick={onToggle} className="flex min-h-11 w-full items-center justify-between py-2 font-bold text-navy">
+      {title}
+      <img key={expanded ? "minus" : "plus"} src={expanded ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
+    </button>
+    {expanded && (<div className="pb-2">
+      {items.map(([label, to]) => (<Link key={label} to={to} prefetch="intent" onClick={onNavigate} className="block min-h-11 content-center border-b border-line py-2 pl-4 font-bold text-navy last:border-0">{label}</Link>))}
+    </div>)}
+  </div>);
+}
 // Note: the mockup also lists "Curtain" under Categories, but no curtain
 // product or application exists in the catalogue, so no Curtain link is
 // invented here — it would lead nowhere real.
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [megaOpen, setMegaOpen] = useState(false);
+  const { pathname } = useLocation();
+  const closeMobile = () => { setOpen(false); setMobileSection(null); };
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = headerRef.current;
@@ -78,11 +96,28 @@ export function Header() {
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeMobile(); };
     window.addEventListener("keydown", onKey);
     return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", onKey); };
   }, [open]);
+  // Drawer lifecycle (test plan NAV-14/NAV-16, user request 2026-10-26):
+  // close on route change (covers browser Back/Forward) and when the
+  // viewport reaches desktop width (drawer is CSS-hidden there, so an
+  // open state would otherwise leave the body scroll-locked with no
+  // visible close control).
+  useEffect(() => { closeMobile(); }, [pathname]);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => { if (mq.matches) closeMobile(); };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
+  // Touch/tap fix (2026-10-25): a tap fires mouseenter then click within
+  // milliseconds, so hover-open + click-toggle cancelled each other out and
+  // the menu closed at once, leaving the plus icon. Clicks arriving within
+  // 500ms of a hover-open are therefore ignored; a later tap still toggles.
+  const megaHoverAt = useRef(0);
   const closeMega = () => { setMegaOpen(false); megaButtonRef.current?.focus(); };
   return (<><header ref={headerRef} onMouseLeave={() => setMegaOpen(false)} className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
     <div className="bg-navy px-4 py-2 text-center text-[13px] text-white">
@@ -90,11 +125,11 @@ export function Header() {
     </div>
     <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-[30px] lg:px-6 xl:px-12">
       <Wordmark />
-      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><img src="/icons/menu-alt-1.svg" alt="" aria-hidden="true" width={22} height={22} className="h-[22px] w-[22px]" /> Menu</button>
+      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded-full border border-line bg-white px-3 font-semibold text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><img src="/icons/menu-alt-1.svg" alt="" aria-hidden="true" width={22} height={22} className="h-[22px] w-[22px]" /> Menu</button>
       <nav aria-label="Primary" className="hidden items-center gap-3 lg:flex xl:gap-6">
         <div>
-          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onMouseEnter={() => setMegaOpen(true)} onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
-            Collections <img src={megaOpen ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
+          <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onMouseEnter={() => { megaHoverAt.current = Date.now(); setMegaOpen(true); }} onClick={() => { if (Date.now() - megaHoverAt.current < 500) return; setMegaOpen((v) => !v); }} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-semibold text-navy">
+            Collections <img key={megaOpen ? "minus" : "plus"} src={megaOpen ? "/icons/minus.svg" : "/icons/plus.svg"} alt="" aria-hidden="true" width={14} height={14} className="h-3.5 w-3.5" />
           </button>
         </div>
         <Link to="/#best-sellers" prefetch="intent" className="text-[15px] font-bold text-navy">Best Sellers</Link>
@@ -105,11 +140,11 @@ export function Header() {
         <Form method="get" action="/products" role="search" className="flex">
           <label htmlFor="site-search" className="sr-only">Search products</label>
           <input id="site-search" name="q" type="search" placeholder="Search handles, locks, hinges…" className="min-h-11 w-full min-w-0 rounded-l border border-line bg-white px-3 text-[15px] lg:w-36 xl:w-64" />
-          <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-[#33312e]">Search</RawkButton>
+          <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy">Search</RawkButton>
         </Form>
       </div>
-      <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full bg-navy px-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-[#33312e] lg:inline-flex xl:px-5">Buy From Amazon</RawkButton>
-      <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy px-3 text-sm font-bold text-navy transition-colors duration-300 hover:bg-navy hover:text-white lg:inline-flex xl:px-5">Contact Us</RawkButton>
+      <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="order-4 hidden min-h-11 items-center rounded-full border border-navy bg-navy px-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy lg:inline-flex xl:px-5">Buy From Amazon</RawkButton>
+      <RawkButton variant="custom" to="/contact" className="order-5 hidden min-h-11 items-center rounded-full border border-navy bg-navy px-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy lg:inline-flex xl:px-5">Contact Us</RawkButton>
     </div>
     {megaOpen && (
       <div className="mega-menu absolute left-0 right-0 top-full z-50 hidden overflow-hidden border-b border-line bg-white shadow-xl lg:block" onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }}>
@@ -151,20 +186,20 @@ export function Header() {
   </header>
     {open && (
       <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-        <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="absolute inset-0 h-full w-full bg-black/50" />
+        <button type="button" aria-label="Close menu" onClick={closeMobile} className="absolute inset-0 h-full w-full bg-black/50" />
         <div id="mobile-menu" className="drawer-panel absolute right-0 top-0 flex h-full w-[320px] max-w-[85vw] flex-col bg-white shadow-xl">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
-            <span onClick={() => setOpen(false)}><Wordmark /></span>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/cross.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
+            <span className="text-sm font-bold text-navy">Menu</span>
+            <button type="button" onClick={closeMobile} aria-label="Close menu" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent hover:text-navy"><img src="/icons/cross.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
           </div>
           <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-3">
-            <p className="py-2 text-xs font-semibold uppercase tracking-wide text-muted">Collections</p>
-            {CATEGORIES.map((c) => (<Link key={c.slug} to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy">{c.name}</Link>))}
+            <MobileAccordion title="Categories" items={CATEGORIES.map((c) => [c.name, `/categories/${c.slug}`] as const)} expanded={mobileSection === "categories"} onToggle={() => setMobileSection(mobileSection === "categories" ? null : "categories")} onNavigate={closeMobile} />
+            <MobileAccordion title="Collections" items={MENU_COLLECTIONS} expanded={mobileSection === "collections"} onToggle={() => setMobileSection(mobileSection === "collections" ? null : "collections")} onNavigate={closeMobile} />
             {[["Best Sellers", "/#best-sellers"], ["All products", "/products"], ["About Us", "/about"], ["Bulk Orders", "/bulk-orders"], ["Guides", "/guides"], ["Contact", "/contact"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
-              <Link key={to} to={to} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
+              <Link key={to} to={to} prefetch="intent" onClick={closeMobile} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
           </nav>
           <div className="flex flex-col gap-3 border-t border-line px-4 py-4">
-            <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="flex min-h-11 items-center justify-center rounded-full bg-navy px-5 text-sm font-bold text-white">Buy From Amazon</RawkButton>
+            <RawkButton variant="custom" href="https://www.amazon.in/dp/B0GMD2D2JY" target="_blank" className="flex min-h-11 items-center justify-center rounded-full border border-navy bg-navy px-5 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy">Buy From Amazon</RawkButton>
             <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="w-full">WhatsApp Enquiry</RawkButton>
           </div>
         </div>
@@ -175,7 +210,7 @@ export function Header() {
 
 function FooterGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <details className="footer-group border-b border-white/15 py-2 lg:border-0 lg:py-0">
+    <details open className="footer-group border-b border-white/15 py-2 lg:border-0 lg:py-0">
       <summary className="flex cursor-pointer list-none items-center justify-between font-semibold lg:cursor-default">
         {title}<span aria-hidden className="footer-chevron lg:hidden">▾</span>
       </summary>
@@ -228,7 +263,7 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white p-[16px] sm:p-[16px] lg:hidden lg:px-[20px] lg:py-[30px]">
+  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 sm:px-[30px] sm:py-5 lg:hidden">
     <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
     <RawkButton to="/bulk-orders" className="flex-1">Bulk Quote</RawkButton>
   </div>);

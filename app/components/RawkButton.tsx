@@ -5,13 +5,16 @@ import { Link } from "react-router";
  * Shared RAWK button — the ONLY button style used across the site.
  *
  * - `to` renders an internal <Link>, `href` renders an <a>, otherwise a <button>.
- * - variant "primary" is the default design (charcoal, ivory text) — the same
- *   design used in the navigation mega menu and the footer.
+ * - Uniform button system (user rule 2026-10-25): every button is
+ *   font-semibold (600) and rounded-full.
+ * - Light background (primary/secondary): solid charcoal bg + white text;
+ *   hover = transparent bg + charcoal border + charcoal text.
+ * - Dark background (onDark/onDarkSecondary): solid white bg + charcoal
+ *   text; hover = transparent bg + white border + white text.
+ * - WhatsApp keeps its green brand colour but follows the same pattern:
+ *   solid green + white text; hover = transparent + green border/text.
  * - variant "custom" applies NO shared styling at all: the caller-supplied
  *   className is used exactly as passed, for one-off designs only.
- * - Hover: primary/secondary/on-dark buttons shift contrast, lift 1px and
- *   gain a soft shadow; the transition is 300ms and is disabled entirely
- *   under prefers-reduced-motion (see app.css).
  */
 export type RawkButtonVariant =
   | "primary"
@@ -40,25 +43,25 @@ export type RawkButtonProps = {
 
 // Navigation / buttons use Lato Bold 700 (font table).
 const BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded px-5 text-sm font-bold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass disabled:opacity-50";
 
 const VARIANTS: Record<Exclude<RawkButtonVariant, "custom">, string> = {
   // Charcoal button, ivory text — the shared default (header, mega menu, footer).
   primary:
-    "bg-navy text-white hover:-translate-y-px hover:bg-[#33312e] hover:shadow-md active:translate-y-0",
+    "border border-navy bg-navy text-white hover:bg-transparent hover:text-navy",
   // Transparent, charcoal border/text — flips to charcoal on hover.
   secondary:
-    "border border-navy bg-transparent text-navy hover:-translate-y-px hover:bg-navy hover:text-white hover:shadow-md active:translate-y-0",
+    "border border-navy bg-navy text-white hover:bg-transparent hover:text-navy",
   // Ivory fill on a dark surface (bulk banner, footer final row).
   onDark:
-    "bg-white text-navy hover:-translate-y-px hover:bg-ivory hover:shadow-md active:translate-y-0",
+    "border border-white bg-white text-navy hover:bg-transparent hover:text-white",
   // Ivory outline on a dark surface.
   onDarkSecondary:
-    "border border-white/60 bg-transparent text-white hover:-translate-y-px hover:bg-white hover:text-navy hover:shadow-md active:translate-y-0",
+    "border border-white bg-white text-navy hover:bg-transparent hover:text-white",
   // WhatsApp Enquiry: green background, white text, WhatsApp logo
   // (see whatsappIcon). Used for every WhatsApp action site-wide.
   whatsapp:
-    "bg-wa text-white hover:-translate-y-px hover:brightness-110 hover:shadow-md active:translate-y-0",
+    "border border-wa bg-wa text-white hover:bg-transparent hover:text-wa",
 };
 
 export default function RawkButton({

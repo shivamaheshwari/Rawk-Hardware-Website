@@ -165,7 +165,7 @@ export default function RawkSwiper({
               onClick={() => swiperRef.current?.slidePrev()}
               disabled={!loop && active === 0}
               aria-label="Previous items"
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-navy"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent disabled:hover:border-line disabled:hover:bg-white disabled:hover:text-navy"
             >
               ←
             </button>
@@ -194,7 +194,7 @@ export default function RawkSwiper({
               onClick={() => swiperRef.current?.slideNext()}
               disabled={!loop && active >= maxIndex}
               aria-label="Next items"
-              className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-navy"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent disabled:hover:border-line disabled:hover:bg-white disabled:hover:text-navy"
             >
               →
             </button>

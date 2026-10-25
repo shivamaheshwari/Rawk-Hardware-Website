@@ -129,7 +129,7 @@ export default function Home() {
   // page dots are exactly 5 (20 / 4). Products without a real photo yet
   // show the labelled placeholder panel — never a fake photo.
   const bestsellers = PRODUCTS.slice(0, 20);
-  const [visibleCount, setVisibleCount] = useState(6);
+
   const bulkImage = PRODUCTS.find((p) => p.slug === "509-handle")!;
   const [heroSwiper, setHeroSwiper] = useState<SwiperType | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
@@ -167,13 +167,13 @@ export default function Home() {
         {HERO_SLIDES.map((s, i) => (<HeroSlide key={s.slug} slide={s} isFirst={i === 0} />))}
       </RawkSwiper>
       <div className="mx-auto flex w-full max-w-[1440px] items-center gap-4 px-4 pt-4 sm:px-[30px] lg:px-12">
-        <button type="button" onClick={() => heroSwiper?.slidePrev()} aria-label="Previous slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px] rotate-180" /></button>
-        <button type="button" onClick={() => heroSwiper?.slideNext()} aria-label="Next slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
+        <button type="button" onClick={() => heroSwiper?.slidePrev()} aria-label="Previous slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px] rotate-180" /></button>
+        <button type="button" onClick={() => heroSwiper?.slideNext()} aria-label="Next slide" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent"><img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
         <span className="text-sm font-medium tabular-nums text-muted" aria-live="polite">{String(heroIndex + 1).padStart(2, "0")} / {String(HERO_SLIDES.length).padStart(2, "0")}</span>
         <div className="h-0.5 flex-1 overflow-hidden rounded bg-line" role="progressbar" aria-label="Slide autoplay progress" aria-valuenow={Math.round(heroProgress * 100)} aria-valuemin={0} aria-valuemax={100}>
           <div ref={progressRef} className="h-full bg-brass transition-[width] duration-200" style={{ width: `${Math.round(heroProgress * 100)}%` }} />
         </div>
-        <button type="button" onClick={toggleHeroPause} aria-label={heroPaused ? "Play hero slider" : "Pause hero slider"} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white">
+        <button type="button" onClick={toggleHeroPause} aria-label={heroPaused ? "Play hero slider" : "Pause hero slider"} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent">
           {heroPaused ? "▶" : "❚❚"}
         </button>
       </div>
@@ -216,24 +216,18 @@ export default function Home() {
       </div>
     </Section>
 
-    {/* 4 — Best sellers: desktop slider (4 at a time, 1s smooth autoplay,
-        arrows removed, page dots only) + tablet/mobile grid with Load More. */}
+    {/* 4 — Best sellers: swiper slider on every width (user request
+        2026-10-25): 1.5 cards visible on mobile, 2.5 on tablet, 4 on
+        desktop, one card per swipe step, all cards equal height. No grid
+        and no Load More — swiping reveals all 20 best sellers. Note: a
+        hard 300px card floor would shrink the mobile peek to ~1.2 cards
+        (1.5 x 300px = 450px > a 360px phone screen), so card width comes
+        from the fractional view instead: ~230px phones, ~270-370px
+        tablets, ~300px+ desktop. */}
     <Section id="best-sellers" eyebrow="Best Sellers" title="Our Best Sellers" action={<RawkButton to="/products" variant="secondary">View all products</RawkButton>}>
-      <div className="hidden lg:block">
-        <RawkSwiper label="Best sellers" perView={{ mobile: 4, tablet: 4, desktop: 4 }} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false}>
-          {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
-        </RawkSwiper>
-      </div>
-      <div className="lg:hidden">
-        <div className="grid grid-cols-2 gap-4">
-          {bestsellers.slice(0, visibleCount).map((p) => (<BestsellerCard key={p.slug} p={p} />))}
-        </div>
-        {visibleCount < bestsellers.length && (
-          <div className="mt-6 flex justify-center">
-            <RawkButton onClick={() => setVisibleCount((v) => Math.min(bestsellers.length, v + 4))}>Load More</RawkButton>
-          </div>
-        )}
-      </div>
+      <RawkSwiper label="Best sellers" perView={{ mobile: 1.5, tablet: 2.5, desktop: 4 }} slidesPerGroup={1} spaceBetween={16} autoplay autoplayMs={4000} speed={700} loop usePagination showArrows={false} showDots={false} className="best-sellers-swiper">
+        {bestsellers.map((p) => (<BestsellerCard key={p.slug} p={p} />))}
+      </RawkSwiper>
     </Section>
 
     {/* 5 — Bulk-order banner */}
@@ -243,7 +237,7 @@ export default function Home() {
           <h2 className="font-serif text-3xl leading-tight sm:text-4xl">Big projects. Better partnerships.</h2>
           <p className="mt-3 max-w-md text-white/80">For dealers, retailers and project requirements.</p>
           <div className="mt-6">
-            <RawkButton to="/bulk-orders" variant="custom" arrow className="inline-flex min-h-11 items-center justify-center gap-2 rounded border border-transparent bg-white px-5 text-sm font-bold text-navy transition-all duration-300 hover:border-white hover:bg-transparent hover:text-white">Enquire for Bulk Orders</RawkButton>
+            <RawkButton to="/bulk-orders" variant="custom" arrow className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent bg-white px-5 text-sm font-semibold text-navy transition-all duration-300 hover:border-white hover:bg-transparent hover:text-white">Enquire for Bulk Orders</RawkButton>
           </div>
         </div>
         <div className="relative min-h-[310px] overflow-hidden lg:min-h-[340px]">
@@ -282,8 +276,33 @@ export default function Home() {
     </Section>
 
     <section className="mx-auto w-full max-w-[1440px] px-4 pb-12 sm:px-[30px] lg:px-12">
-      <div className="rounded border border-line bg-white p-5 text-sm text-muted">
-        <strong className="text-navy">{BUSINESS.businessName}</strong> — {BUSINESS.address}. Phone: {BUSINESS.phones.join(" / ")}. Instagram: <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">{BUSINESS.instagram}</a>. Enquire on WhatsApp: <a className="underline" href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" rel="noreferrer">message the shop</a>.
+      <div className="grid items-stretch gap-6 lg:grid-cols-2">
+        <div className="overflow-hidden rounded border border-line">
+          <iframe
+            title="Vinayak Enterprises location map"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3579.857648564258!2d78.15121357487061!3d26.201308590301593!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3976c5d25b2d979b%3A0x69dc3787508e1b35!2sVinayak%20Enterprise!5e0!3m2!1sen!2sin!4v1792952565320!5m2!1sen!2sin"
+            className="h-[450px] w-full border-0 lg:h-full"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        </div>
+        <div className="rounded border border-line bg-white p-5 sm:p-6">
+          <h2 className="text-xl font-bold text-navy">Visit our shop</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            <strong className="text-navy">{BUSINESS.businessName}</strong><br />{BUSINESS.address}
+          </p>
+          <p className="mt-3 text-sm text-muted">
+            Phone: {BUSINESS.phones.map((phone, i) => (<span key={phone}>{i > 0 && " / "}<a className="underline" href={`tel:${phone}`}>{phone}</a></span>))}
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Instagram: <a className="underline" href={BUSINESS.instagramUrl} target="_blank" rel="noreferrer">{BUSINESS.instagram}</a>
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <RawkButton variant="whatsapp" href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" rel="noreferrer">Enquire on WhatsApp</RawkButton>
+            <RawkButton variant="secondary" href="https://www.google.com/maps/search/?api=1&query=26.201308590301593,78.15121357487061" target="_blank" rel="noreferrer">Get Directions</RawkButton>
+          </div>
+        </div>
       </div>
     </section>
   </>);
