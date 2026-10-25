@@ -1,12 +1,78 @@
 @import "tailwindcss";
 @theme {
-  --color-navy: #10243A; --color-ivory: #F7F4EE; --color-brass: #B38A48;
-  --color-body: #263342; --color-muted: #596574; --color-line: #E2E5E9; --color-wa: #176B42;
-  --font-serif: "DM Serif Display", Georgia, serif; --font-sans: Inter, system-ui, sans-serif;
+  /* Design.md tokens: warm ivory, charcoal primary, sparing brass accent. */
+  --color-navy: #22211e; --color-ivory: #faf8f3; --color-brass: #a47a3c;
+  --color-body: #2e2b26; --color-muted: #66625b; --color-line: #e5e0d7; --color-wa: #176b42;
+  /* Font table: headings, nav, buttons, product names and body = Lato
+     (headings/nav/buttons Bold 700, body Regular 400); hero heading =
+     Single font family site-wide (user instruction 2026-10-25): Lato
+     only — 400 body, 700 headings/nav/buttons, 900 hero. --font-serif
+     and --font-condensed both resolve to Lato so older class names
+     still render the same family. */
+  --font-serif: "Lato", sans-serif; --font-sans: "Lato", sans-serif;
+  --font-condensed: "Lato", sans-serif;
 }
 html { scroll-behavior: smooth; }
-body { background: #F7F4EE; color: #263342; font-family: Inter, system-ui, sans-serif; }
+body { background: #faf8f3; color: #2e2b26; font-family: "Lato", sans-serif; font-weight: 400; }
+/* Headings site-wide: Lato Bold 700 (hero keeps its 900 class, which
+   outranks this element rule). */
+h1, h2, h3 { font-weight: 700; }
 a, button { -webkit-tap-highlight-color: transparent; }
-a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #B38A48; outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #a47a3c; outline-offset: 2px; }
+/* Search inputs only (user request 2026-10-25): no gold focus line while
+   typing. Other inputs/buttons keep the brass focus outline. */
+input[type="search"]:focus-visible, #drawer-search:focus-visible { outline: none; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
 .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+
+/* Marketplace marquee: seamless 30s loop, paused by .marquee-paused. */
+@keyframes rawk-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.rawk-marquee-track { animation: rawk-marquee 30s linear infinite; will-change: transform; }
+.rawk-marquee-track.marquee-paused { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .rawk-marquee-track { animation: none; flex-wrap: wrap; }
+}
+
+/* Footer link groups: open by default on all widths (user request
+   2026-10-26 — items must not hide inside closed accordions); tapping a
+   heading on mobile can still collapse its group. */
+.footer-group summary::-webkit-details-marker { display: none; }
+.footer-group summary::marker { content: ""; }
+@media (min-width: 1024px) {
+  .footer-group > div { display: block !important; }
+  .footer-group summary { cursor: default; }
+  .footer-group summary::-webkit-details-marker { display: none; }
+  .footer-group summary .footer-chevron { display: none; }
+}
+
+/* Swiper pagination (best sellers): dots below the slider, one per page. */
+.swiper { overflow: hidden; }
+.swiper-wrapper { align-items: stretch; }
+
+/* Mobile sidebar drawer: slides in from the right, like the shared ref. */
+.drawer-panel { animation: drawer-in 0.3s ease-out; }
+@keyframes drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+/* Best sellers page dots: below the slider, brass theme, smooth grow. */
+.swiper .swiper-pagination { position: static; margin-top: 28px; display: flex; justify-content: center; gap: 10px; }
+.swiper .swiper-pagination-bullet { width: 12px; height: 12px; margin: 0 !important; background: #d8cfc0; opacity: 1; transition: width 0.5s ease, background-color 0.5s ease; }
+.swiper .swiper-pagination-bullet-active { width: 36px; border-radius: 9999px; background: #a47a3c; }
+
+/* Mega menu: fade + slight slide-down on open, like the reference menu. */
+.mega-menu { animation: mega-in 0.25s ease-out; }
+@keyframes mega-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Testimonials: every card the same height (slides stretch to the row,
+   and the card fills its slide), even when quotes differ in length. */
+.testimonials-swiper .swiper-slide { height: auto; display: flex; }
+.testimonials-swiper .swiper-slide > article { flex: 1 1 auto; width: 100%; }
+/* Best sellers: same equal-height treatment — every card the same size
+   on mobile, tablet and desktop slider views alike. */
+.best-sellers-swiper .swiper-slide { height: auto; display: flex; }
+.best-sellers-swiper .swiper-slide > article { flex: 1 1 auto; width: 100%; }
+
+/* FAQ accordion: plus icon turns into a cross when open. */
+.faq-item summary { list-style: none; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item .faq-toggle { transition: transform 0.3s ease; }
+.faq-item[open ] .faq-toggle { transform: rotate(45deg); }

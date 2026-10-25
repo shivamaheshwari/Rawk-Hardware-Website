@@ -22,7 +22,7 @@ npm run typecheck  # tsc -b
 
 | Route | What it is |
 |---|---|
-| `/` | Home: hero, 6 categories, featured slider, finish slider, applications, wholesale banner, guides, FAQ, mobile enquiry bar |
+| `/` | Home (design-revamp): Swiper hero slider, marketplace marquee, 6 collections, best-sellers slider, bulk banner, sample testimonials (labelled, not real reviews), footer, mobile enquiry bar. Shared `RawkButton` and client-side `RawkSwiper` components are used for all CTAs/sliders. Guides, finishes and FAQ live on their own routes, not the homepage. |
 | `/products` | Search (title/category/SKU) + filters (category, finish, material, application) via URL params, sort by name/featured (no price sort — no prices exist) |
 | `/categories/:slug` | handles, knobs, locks, hinges, drain-jali, drain-pipes |
 | `/products/:slug` | Gallery, size/finish/pack variant switching (SKU, specs, image and Amazon link update together; impossible combinations are disabled), WhatsApp draft, quote prefill, related products |

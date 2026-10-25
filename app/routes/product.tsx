@@ -6,6 +6,7 @@ import { canonical, breadcrumbJsonLd, productJsonLd } from "../lib/seo";
 import ProductCard, { ProductImage } from "../components/ProductCard";
 import { Breadcrumbs, Faq, JsonLd } from "../components/Misc";
 import { useEnquiry } from "../components/Chrome";
+import RawkButton from "../components/RawkButton";
 export type ProductData = { p: Product };
 export const loader: LoaderFunction = ({ params }): ProductData => {
   const p = productBySlug(params.slug ?? "");
@@ -64,19 +65,19 @@ export default function ProductPage() {
         <fieldset className="mt-5"><legend className="font-semibold text-navy">Finish</legend>
           <div className="mt-2 flex flex-wrap gap-2">{p.finishes.map((f) => {
             const disabled = !p.variants.some((v) => v.finish === f);
-            return (<button key={f} type="button" disabled={disabled} onClick={() => setFinish(f)} aria-pressed={finish === f} className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-sm font-medium ${finish === f ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"} disabled:opacity-40`}>
+            return (<button key={f} type="button" disabled={disabled} onClick={() => setFinish(f)} aria-pressed={finish === f} className={`flex min-h-11 items-center gap-2 rounded-full border px-3 text-sm font-semibold ${finish === f ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"} disabled:opacity-40`}>
               <span className="h-4 w-4 rounded-full border border-line" style={{ background: FINISH_SWATCH[f] ?? "#ccc" }} />{f}{disabled ? " (unavailable)" : ""}</button>);
           })}</div></fieldset>
         <fieldset className="mt-4"><legend className="font-semibold text-navy">Size</legend>
-          <div className="mt-2 flex flex-wrap gap-2">{sizes.map((s) => (<button key={s} type="button" onClick={() => setSize(s)} aria-pressed={size === s} className={`min-h-11 rounded-lg border px-3 text-sm font-medium ${size === s ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>{s}</button>))}</div></fieldset>
+          <div className="mt-2 flex flex-wrap gap-2">{sizes.map((s) => (<button key={s} type="button" onClick={() => setSize(s)} aria-pressed={size === s} className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${size === s ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>{s}</button>))}</div></fieldset>
         <fieldset className="mt-4"><legend className="font-semibold text-navy">Pack quantity</legend>
-          <div className="mt-2 flex flex-wrap gap-2">{packs.map((pk) => (<button key={pk} type="button" onClick={() => setPack(pk)} aria-pressed={pack === pk} className={`min-h-11 rounded-lg border px-3 text-sm font-medium ${pack === pk ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>Pack of {pk}</button>))}</div></fieldset>
+          <div className="mt-2 flex flex-wrap gap-2">{packs.map((pk) => (<button key={pk} type="button" onClick={() => setPack(pk)} aria-pressed={pack === pk} className={`min-h-11 rounded-full border px-3 text-sm font-semibold ${pack === pk ? "border-brass bg-ivory ring-1 ring-brass" : "border-line bg-white"}`}>Pack of {pk}</button>))}</div></fieldset>
         <label className="mt-4 block font-semibold text-navy">Quantity
           <input type="number" min={1} value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} className="mt-2 block min-h-11 w-32 rounded-lg border border-line bg-white px-3" /></label>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a href={wa} target="_blank" rel="noreferrer" className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-wa px-4 font-semibold text-white sm:flex-none sm:px-6">Enquire on WhatsApp</a>
-          <Link to={`/bulk-orders?sku=${encodeURIComponent(variant.sku)}&qty=${qty}`} className="flex min-h-12 flex-1 items-center justify-center rounded-lg bg-navy px-4 font-semibold text-white sm:flex-none sm:px-6">Request Quote</Link>
-          {variant.amazon_url && (<a href={variant.amazon_url} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center rounded-lg border border-navy px-4 font-semibold text-navy">View on Amazon ↗</a>)}
+          <RawkButton variant="whatsapp" href={wa} target="_blank" className="flex-1 sm:flex-none sm:px-6">Enquire on WhatsApp</RawkButton>
+          <RawkButton to={`/bulk-orders?sku=${encodeURIComponent(variant.sku)}&qty=${qty}`} className="flex-1 sm:flex-none sm:px-6">Request Quote</RawkButton>
+          {variant.amazon_url && (<RawkButton variant="secondary" href={variant.amazon_url} target="_blank">View on Amazon ↗</RawkButton>)}
         </div>
         <p className="mt-2 text-xs text-muted">WhatsApp opens a draft message — you send it yourself. The Amazon button appears only for this verified listing.</p>
       </div>

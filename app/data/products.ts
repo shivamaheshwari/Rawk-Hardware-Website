@@ -129,10 +129,15 @@ export function searchProducts(q: string): Product[] {
   const needle = q.trim().toLowerCase(); if (!needle) return PRODUCTS;
   return PRODUCTS.filter((p) => [p.title, p.category, ...p.variants.map((v) => v.sku), ...p.finishes].join(" ").toLowerCase().includes(needle));
 }
-export function filterProducts(list: Product[], f: { category?: string; finish?: string; material?: string; application?: string }): Product[] {
+/**
+ * Combination filters: each dimension is a list of values. A product
+ * matches when it hits ANY value in a dimension (OR) and every dimension
+ * that has values (AND across dimensions). An empty dimension matches all.
+ */
+export function filterProducts(list: Product[], f: { category?: string[]; finish?: string[]; material?: string[]; application?: string[] }): Product[] {
   return list.filter((p) =>
-    (!f.category || p.category === f.category) &&
-    (!f.finish || p.finishes.includes(f.finish)) &&
-    (!f.material || p.variants.some((v) => v.material === f.material)) &&
-    (!f.application || p.applications.includes(f.application)));
+    (!f.category?.length || f.category.includes(p.category)) &&
+    (!f.finish?.length || p.finishes.some((x) => f.finish!.includes(x))) &&
+    (!f.material?.length || p.variants.some((v) => f.material!.includes(v.material))) &&
+    (!f.application?.length || p.applications.some((a) => f.application!.includes(a))));
 }

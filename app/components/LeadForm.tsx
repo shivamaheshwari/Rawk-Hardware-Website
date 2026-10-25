@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Form, useActionData, useNavigation, useSearchParams } from "react-router";
 import { whatsappUrl } from "../lib/site";
+import RawkButton from "./RawkButton";
 export type ActionResult = { ok: boolean; errors?: Record<string, string>; values?: Record<string, string>; duplicate?: boolean; error?: string };
 export default function LeadForm({ source, heading }: { source: string; heading: string }) {
   const action = useActionData() as ActionResult | undefined;
@@ -15,7 +16,7 @@ export default function LeadForm({ source, heading }: { source: string; heading:
     <h2 className="font-serif text-2xl text-navy">Enquiry received — thank you.</h2>
     <p className="mt-2 text-body">{action.duplicate ? "This enquiry was already recorded, so it has not been duplicated." : "Your enquiry has been saved. The shop will confirm price and availability and get back to you."}</p>
     <p className="mt-2 text-sm text-muted">If you need a faster reply, you can also message the shop on WhatsApp.</p>
-    <a href={whatsappUrl("Hello, I just submitted an enquiry on the RAWK website. Could you please check it?")} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-wa px-4 text-sm font-semibold text-white">Message on WhatsApp</a>
+    <RawkButton variant="whatsapp" href={whatsappUrl("Hello, I just submitted an enquiry on the RAWK website. Could you please check it?")} target="_blank" className="mt-4">Message on WhatsApp</RawkButton>
   </div>);
   return (<div>
     <h2 className="font-serif text-2xl text-navy">{heading}</h2>
@@ -36,8 +37,8 @@ export default function LeadForm({ source, heading }: { source: string; heading:
       <label className="block text-sm font-medium text-navy sm:col-span-2">Notes<textarea name="notes" rows={4} defaultValue={v("notes")} className="mt-1 min-h-11 w-full rounded-lg border border-line px-3 py-2 font-normal" /></label>
       <label className="flex items-start gap-2 text-sm text-body sm:col-span-2"><input type="checkbox" name="marketing" className="mt-1 h-5 w-5" />I agree to receive marketing messages about RAWK products (optional, unchecked by default).</label>
       <p className="text-xs text-muted sm:col-span-2">Privacy notice: your details are used only to respond to this enquiry. They are stored privately and are not published on this site.</p>
-      <div className="sm:col-span-2"><button type="submit" disabled={sending} className="min-h-12 rounded-lg bg-navy px-6 font-semibold text-white disabled:opacity-50">{sending ? "Sending…" : "Submit enquiry"}</button>
-        <a href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" rel="noreferrer" className="ml-3 inline-flex min-h-12 items-center rounded-lg bg-wa px-4 text-sm font-semibold text-white">WhatsApp fallback</a></div>
+      <div className="flex flex-wrap items-center gap-3 sm:col-span-2"><RawkButton type="submit" disabled={sending} className="px-6">{sending ? "Sending…" : "Submit enquiry"}</RawkButton>
+        <RawkButton variant="whatsapp" href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank">WhatsApp fallback</RawkButton></div>
     </Form>
   </div>);
 }
