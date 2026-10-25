@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Form, Link, NavLink, Outlet, useLocation } from "react-router";
 import { BUSINESS, whatsappUrl } from "../lib/site";
-import { CATEGORIES, allFinishes } from "../data/products";
+import { CATEGORIES, PRODUCTS } from "../data/products";
 import RawkButton from "./RawkButton";
 
 export const EnquiryContext = createContext<{ message: string; setMessage: (m: string) => void }>({ message: "Hello, I would like to enquire about RAWK hardware products.", setMessage: () => {} });
@@ -14,13 +14,16 @@ export const useEnquiry = () => useContext(EnquiryContext);
 // Drive thumbnails are the fallback (binary PNGs cannot be pushed to
 // GitHub via the snapshot API, so a GitHub-only deploy would miss them),
 // then the text wordmark. Single font family site-wide: Lato.
+// NOTE 2026-10-25: the logo file uploaded that day (1600x800, 2:1) is
+// solid black with no visible artwork, so it was NOT swapped in; the
+// existing black logo keeps running with the new sizing below.
 const LOGO_BLACK = "https://drive.google.com/thumbnail?id=1g08wSEhpqE_LKLDndnMb_pei13XZDTRF&sz=w200";
 const LOGO_WHITE = "https://drive.google.com/thumbnail?id=1poseI903UQVoSMTAvNZBtjLnBUFsryeJ&sz=w200";
 function LogoImg({ local, drive, alt }: { local: string; drive: string; alt: string }) {
   const [stage, setStage] = useState(0);
   if (stage === 2) return <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>;
   const src = stage === 0 ? local : drive;
-  return <img src={src} alt={alt} width={140} height={40} className="h-10 w-auto" onError={() => setStage((v) => v + 1)} />;
+  return <img src={src} alt={alt} className="aspect-[2/1] max-h-[70px] w-auto object-contain" onError={() => setStage((v) => v + 1)} />;
 }
 function Wordmark() {
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
@@ -41,6 +44,27 @@ const USE_AREAS = [
   ["Bathroom", "/products?application=Bathroom+%26+Utility"],
   ["Wardrobes", "/products?application=Wardrobes"],
 ] as const;
+// Mega menu groups as specified by the user (2026-10-25). No group shows
+// more than 6 items. Destinations reuse real catalogue pages only:
+// Categories map to the matching application filter (Curtain has no
+// catalogue data, so it falls back to all products); Collections map to
+// the closest real category (drawer items, pulls and handles are all
+// handle types in this catalogue; towel hangers to the bathroom filter);
+// Best Sellers lists the first 6 featured products.
+const MENU_CATEGORIES = [
+  ["Door Accessories", "/products?application=Doors+%26+Gates"],
+  ["Curtain Accessories", "/products"],
+  ["Kitchen Accessories", "/products?application=Kitchen+Cabinets"],
+  ["Bathroom Accessories", "/products?application=Bathroom+%26+Utility"],
+] as const;
+const MENU_COLLECTIONS = [
+  ["Drawer items", "/categories/handles"],
+  ["Pulls", "/categories/handles"],
+  ["Locks", "/categories/locks"],
+  ["Handles", "/categories/handles"],
+  ["Towel hangers", "/products?application=Bathroom+%26+Utility"],
+] as const;
+const MENU_BEST_SELLERS = PRODUCTS.filter((p) => p.featured).slice(0, 6);
 // Note: the mockup also lists "Curtain" under Categories, but no curtain
 // product or application exists in the catalogue, so no Curtain link is
 // invented here — it would lead nowhere real.
@@ -92,21 +116,21 @@ export function Header() {
             <Link to="/products" prefetch="intent" onClick={() => setMegaOpen(false)} className="text-base font-bold uppercase tracking-wide text-navy hover:text-brass">Shop All Products</Link>
           </div>
           <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Product Type</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">Categories</p>
             <ul className="mt-4 space-y-3">
-              {CATEGORIES.map((c) => (<li key={c.slug}><Link to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{c.name}</Link></li>))}
+              {MENU_CATEGORIES.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{label}</Link></li>))}
             </ul>
           </div>
           <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Use Area</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">Collections</p>
             <ul className="mt-4 space-y-3">
-              {USE_AREAS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{label}</Link></li>))}
+              {MENU_COLLECTIONS.map(([label, to]) => (<li key={label}><Link to={to} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{label}</Link></li>))}
             </ul>
           </div>
-          <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-navy">By Finish</p>
+          <div className="min-w-0 max-w-[240px]">
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">Best Sellers Products</p>
             <ul className="mt-4 space-y-3">
-              {allFinishes.map((f) => (<li key={f}><Link to={`/products?finish=${encodeURIComponent(f)}`} prefetch="intent" onClick={() => setMegaOpen(false)} className="text-[15px] text-navy hover:text-brass">{f}</Link></li>))}
+              {MENU_BEST_SELLERS.map((p) => (<li key={p.slug}><Link to={`/products/${p.slug}`} prefetch="intent" onClick={() => setMegaOpen(false)} title={p.title} className="block truncate text-[15px] text-navy hover:text-brass">{p.title}</Link></li>))}
             </ul>
           </div>
           <div className="relative flex flex-col items-center text-center">
