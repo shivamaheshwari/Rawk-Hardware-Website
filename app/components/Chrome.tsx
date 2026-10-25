@@ -192,6 +192,16 @@ export function Header() {
             <span className="text-sm font-bold text-navy">Menu</span>
             <button type="button" onClick={closeMobile} aria-label="Close menu" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:border-navy hover:bg-transparent hover:text-navy"><img src="/icons/cross.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
           </div>
+          {/* Mobile menu search (user request 2026-10-26): at the top of
+              the drawer, above all menu items (Categories was removed in
+              round 19, so this sits above Collections). Same search as
+              the desktop header — submits to /products?q=… — and closes
+              the drawer on submit. */}
+          <Form method="get" action="/products" role="search" onSubmit={closeMobile} className="flex border-b border-line px-4 py-3">
+            <label htmlFor="mobile-menu-search" className="sr-only">Search products</label>
+            <input id="mobile-menu-search" name="q" type="search" placeholder="Search handles, locks, hinges…" className="min-h-11 w-full min-w-0 rounded-l border border-line bg-white px-3 text-[15px]" />
+            <RawkButton variant="custom" type="submit" className="min-h-11 rounded-l-none rounded-r border border-navy bg-navy px-4 text-sm font-semibold text-white transition-colors duration-300 hover:bg-transparent hover:text-navy">Search</RawkButton>
+          </Form>
           <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-3">
             {/* Mobile menu only (user request 2026-10-26, round 19):
                 Categories is removed; order is Home, Collections,
