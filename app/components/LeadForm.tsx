@@ -29,7 +29,7 @@ export default function LeadForm({ source, heading, showBuyingPurpose }: { sourc
       <label className="block text-sm font-medium text-navy">I am a<select name="customerType" defaultValue={v("customerType", "Retail buyer")} className="mt-1 min-h-11 w-full rounded-lg border border-line bg-white px-2 font-normal">
         {["Retail buyer", "Dealer / retailer", "Interior designer", "Carpenter / contractor", "Other"].map((o) => (<option key={o}>{o}</option>))}</select></label>
       {showBuyingPurpose && (<fieldset className="sm:col-span-2">
-        <legend className="text-sm font-medium text-navy">Buying for a personal or reselling purpose?</legend>
+        <legend className="text-sm font-medium text-navy">Buying for a personal or your reselling purpose?</legend>
         <div className="mt-2 flex flex-wrap gap-5">
           <label className="flex items-center gap-2 text-sm font-normal text-navy"><input type="radio" name="buyingPurpose" value="Personal" defaultChecked={v("buyingPurpose") === "Personal"} className="h-5 w-5" />Personal</label>
           <label className="flex items-center gap-2 text-sm font-normal text-navy"><input type="radio" name="buyingPurpose" value="Reselling" defaultChecked={v("buyingPurpose") === "Reselling"} className="h-5 w-5" />Reselling</label>
