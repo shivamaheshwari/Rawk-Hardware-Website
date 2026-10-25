@@ -1,42 +1,54 @@
+import { useState } from "react";
 import { MARKETPLACES } from "../lib/site";
 import RawkSwiper from "./RawkSwiper";
 
 /**
  * Marketplace / social slider — a real Swiper loop (not a CSS marquee):
  * 3 logos on mobile, 4 on tablet, 6 on desktop, looping with autoplay that
- * keeps running on hover. Logos are the official PNGs from the user's
- * public Drive "Marquee Slider" folder, served via Drive thumbnails
- * (transparent backgrounds, as supplied). Only verified destinations are
- * links — Flipkart / Meesho / JioMart render as plain images, never as
- * invented URLs. If a Drive thumbnail ever fails, the brand name text
- * shows instead, so the slider never shows a broken image.
+ * NEVER stops on interaction: pauseOnHover is false, Swiper's
+ * disableOnInteraction is false, and there is no pause button. Logos are
+ * the PNG files the user uploaded on 2026-10-25 (public/images/marquee/),
+ * in the user's order: Amazon, Flipkart, JioMart, Meesho, WhatsApp,
+ * Instagram. If a local file is missing (e.g. a deploy built from GitHub
+ * alone, where binary PNGs cannot be pushed via the snapshot API), the
+ * Drive thumbnail of the same logo is tried, then the brand name text —
+ * so the slider never shows a broken image.
+ * Only verified destinations are links — Flipkart / Meesho / JioMart
+ * render as plain images, never as invented URLs.
  */
-const LOGO_IDS: Record<string, string> = {
+const LOGO_FILES: Record<string, string> = {
+  amazon: "amazon",
+  Flipkart: "flipkart",
+  JioMart: "jiomart",
+  meesho: "meesho",
+  WhatsApp: "whatsapp",
+  Instagram: "instagram",
+};
+const LOGO_DRIVE_IDS: Record<string, string> = {
   amazon: "1VrWTn3b3FU9eDNCj2ofuiroW-EknlA8M",
   Flipkart: "1gO6Y5MvaAqHanhx8uWrM78ORQIIkYP1K",
-  meesho: "1KwF4JnFOOVoVSoW0feQQAP7Ow84hq0yx",
   JioMart: "1CM_xSrG3rr4Ldo9EZqfOidGdkG6fYZAO",
+  meesho: "1KwF4JnFOOVoVSoW0feQQAP7Ow84hq0yx",
   WhatsApp: "1JLCZyxCsMRiJfnfkihwluLjjGJPSygx0",
   Instagram: "19MDZWRV6quP85n_ZXalwpF1ne_D1BXpo",
 };
 
 function LogoImage({ name }: { name: string }) {
-  const id = LOGO_IDS[name];
-  if (!id) return <span className="font-semibold">{name}</span>;
+  const [stage, setStage] = useState(0);
+  const label = name === "amazon" ? "Amazon" : name;
+  const file = LOGO_FILES[name];
+  const driveId = LOGO_DRIVE_IDS[name];
+  if (stage === 2 || !file) return <span className="text-lg font-semibold">{label}</span>;
+  const src = stage === 0 ? `/images/marquee/${file}.png` : `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
   return (
     <img
-      src={`https://drive.google.com/thumbnail?id=${id}&sz=w400`}
-      alt={name === "amazon" ? "Amazon" : name}
-      width={160}
-      height={44}
+      src={src}
+      alt={label}
+      width={180}
+      height={48}
       loading="lazy"
-      className="h-11 w-auto max-w-[160px] object-contain"
-      onError={(e) => {
-        const img = e.currentTarget;
-        img.style.display = "none";
-        const fallback = img.nextElementSibling as HTMLElement | null;
-        if (fallback) fallback.style.display = "inline";
-      }}
+      className="h-12 w-auto max-w-[180px] object-contain"
+      onError={() => setStage((s) => s + 1)}
     />
   );
 }
@@ -52,7 +64,7 @@ export default function MarketplaceMarquee() {
         <RawkSwiper
           label="Marketplace logos"
           perView={{ mobile: 3, tablet: 4, desktop: 6 }}
-          spaceBetween={24}
+          spaceBetween={40}
           autoplay
           autoplayMs={2000}
           speed={1000}
@@ -63,9 +75,8 @@ export default function MarketplaceMarquee() {
         >
           {MARKETPLACES.map((m) => {
             const content = (
-              <span className="flex min-h-11 items-center justify-center whitespace-nowrap text-navy">
+              <span className="flex min-h-12 items-center justify-center whitespace-nowrap text-navy">
                 <LogoImage name={m.name} />
-                <span style={{ display: "none" }} className="text-lg font-semibold">{m.name === "amazon" ? "Amazon" : m.name}</span>
               </span>
             );
             return m.url ? (

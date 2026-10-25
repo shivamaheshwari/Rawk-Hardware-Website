@@ -79,21 +79,26 @@ function HeroSlide({ slide, isFirst }: { slide: (typeof HERO_SLIDES)[number]; is
 }
 
 function BestsellerCard({ p }: { p: Product }) {
-  const first = p.variants[0];
-  const detail = [
-    first?.material && first.material !== "To be confirmed from sheet" ? first.material : null,
-    first?.size_label && first.size_label !== "Size to be confirmed from sheet" ? first.size_label : null,
-    `${p.finishes.length} finish${p.finishes.length === 1 ? "" : "es"}`,
-  ].filter(Boolean).join(" · ");
+  // Sizes: mounting-centre distances exactly as in the data, e.g.
+  // "96 MM, 160 MM, 224 MM, 288 MM". Falls back to the variant size
+  // labels when a product has no mounting-centre values (e.g. knobs).
+  const centres = [...new Set(p.variants.map((v) => v.mounting_centres_mm).filter((v): v is number => v !== null))];
+  const sizeText = centres.length > 0
+    ? centres.map((c) => `${c} MM`).join(", ")
+    : [...new Set(p.variants.map((v) => v.size_label))].filter((x) => !x.includes("to be confirmed")).join(", ");
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded border border-line bg-white transition-shadow duration-300 hover:shadow-md">
       <Link to={`/products/${p.slug}`} prefetch="intent" aria-label={`View ${p.title}`} className="block overflow-hidden bg-white">
         <ProductImage p={p} />
       </Link>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-navy"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
-        {detail && <p className="text-sm text-muted">{detail}</p>}
-        <p className="text-sm font-medium text-navy">Request current price</p>
+        <h3 className="truncate text-[15px] font-bold leading-snug text-navy"><Link to={`/products/${p.slug}`} prefetch="intent">{p.title}</Link></h3>
+        {/* No review, rating or price exists in the product data, and none
+            is invented: the card shows an honest "No reviews yet" and the
+            enquiry price line until real values are supplied. */}
+        <p className="text-sm text-muted" aria-label="No reviews yet">☆☆☆☆☆ · No reviews yet</p>
+        {sizeText && <p className="text-sm text-muted">Sizes: {sizeText}</p>}
+        <p className="text-sm font-bold text-navy">Price: Request current price</p>
         <div className="mt-auto pt-3">
           <RawkButton to={`/products/${p.slug}`} arrow className="w-full">View Product</RawkButton>
         </div>
@@ -131,7 +136,8 @@ export default function Home() {
         label="Featured hardware"
         perView={{ mobile: 1, tablet: 1, desktop: 1 }}
         autoplay
-        autoplayMs={6000}
+        autoplayMs={5000}
+        speed={400}
         loop
         showArrows={false}
         showDots={false}
@@ -183,9 +189,12 @@ export default function Home() {
             <span className="flex items-center justify-between px-4 py-3 text-sm font-bold text-navy">{c.name}<img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={16} height={16} className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" /></span>
           </Link>
         ))}
-        <Link to="/products" prefetch="intent" className="group flex aspect-[4/3] flex-col items-center justify-center gap-2 overflow-hidden rounded border border-navy bg-navy text-white transition-shadow duration-300 hover:shadow-md">
-          <span className="text-base font-bold">View All</span>
-          <img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 invert transition-transform duration-300 group-hover:translate-x-1" />
+        <Link to="/products" prefetch="intent" className="group overflow-hidden rounded border border-navy bg-white transition-shadow duration-300 hover:shadow-md">
+          <span className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-navy px-2 text-center text-white">
+            <img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={40} height={40} className="h-10 w-10 invert transition-transform duration-300 group-hover:translate-x-1" />
+            <span className="text-sm font-bold">Explore the full catalogue</span>
+          </span>
+          <span className="flex items-center justify-between px-4 py-3 text-sm font-bold text-navy">View All<img src="/icons/arrow-right-bold.svg" alt="" aria-hidden="true" width={16} height={16} className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" /></span>
         </Link>
       </div>
     </Section>

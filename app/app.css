@@ -5,12 +5,18 @@
   --color-body: #2e2b26; --color-muted: #66625b; --color-line: #e5e0d7; --color-wa: #176b42;
   /* Font table: headings, nav, buttons, product names and body = Lato
      (headings/nav/buttons Bold 700, body Regular 400); hero heading =
-     Roboto Condensed Bold 700-900 via --font-condensed. */
-  --font-serif: "Lato", Arial, sans-serif; --font-sans: "Lato", Arial, sans-serif;
-  --font-condensed: "Roboto Condensed", "Lato", Arial, sans-serif;
+     Single font family site-wide (user instruction 2026-10-25): Lato
+     only — 400 body, 700 headings/nav/buttons, 900 hero. --font-serif
+     and --font-condensed both resolve to Lato so older class names
+     still render the same family. */
+  --font-serif: "Lato", sans-serif; --font-sans: "Lato", sans-serif;
+  --font-condensed: "Lato", sans-serif;
 }
 html { scroll-behavior: smooth; }
-body { background: #faf8f3; color: #2e2b26; font-family: "Lato", Arial, sans-serif; font-weight: 400; }
+body { background: #faf8f3; color: #2e2b26; font-family: "Lato", sans-serif; font-weight: 400; }
+/* Headings site-wide: Lato Bold 700 (hero keeps its 900 class, which
+   outranks this element rule). */
+h1, h2, h3 { font-weight: 700; }
 a, button { -webkit-tap-highlight-color: transparent; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #a47a3c; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
@@ -36,6 +42,13 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* Swiper pagination (best sellers): dots below the slider, one per page. */
 .swiper { overflow: hidden; }
-.swiper-pagination { position: relative; margin-top: 16px; display: flex; justify-content: center; gap: 6px; }
-.swiper-pagination-bullet { width: 10px; height: 10px; margin: 0 !important; background: #e5e0d7; opacity: 1; transition: all 300ms; }
-.swiper-pagination-bullet-active { width: 24px; border-radius: 9999px; background: #a47a3c; }
+.swiper-wrapper { align-items: stretch; }
+
+/* Mobile sidebar drawer: slides in from the right, like the shared ref. */
+.drawer-panel { animation: drawer-in 0.3s ease-out; }
+@keyframes drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+/* Best sellers page dots: below the slider, brass theme, smooth grow. */
+.swiper .swiper-pagination { position: static; margin-top: 28px; display: flex; justify-content: center; gap: 10px; }
+.swiper .swiper-pagination-bullet { width: 12px; height: 12px; margin: 0 !important; background: #d8cfc0; opacity: 1; transition: width 0.5s ease, background-color 0.5s ease; }
+.swiper .swiper-pagination-bullet-active { width: 36px; border-radius: 9999px; background: #a47a3c; }

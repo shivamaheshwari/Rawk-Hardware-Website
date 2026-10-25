@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Form, Link, NavLink, Outlet, useLocation } from "react-router";
 import { BUSINESS, whatsappUrl } from "../lib/site";
 import { CATEGORIES } from "../data/products";
@@ -10,22 +10,29 @@ export const useEnquiry = () => useContext(EnquiryContext);
 // Logos: user-supplied Google Drive files. Black logo on the light header,
 // white logo on the dark footer. If Drive ever fails to load, fall back to
 // the text wordmark so the header never shows a broken image.
+// Logos: the PNGs the user uploaded on 2026-10-25 are tried first; the
+// Drive thumbnails are the fallback (binary PNGs cannot be pushed to
+// GitHub via the snapshot API, so a GitHub-only deploy would miss them),
+// then the text wordmark. Single font family site-wide: Lato.
 const LOGO_BLACK = "https://drive.google.com/thumbnail?id=1g08wSEhpqE_LKLDndnMb_pei13XZDTRF&sz=w200";
 const LOGO_WHITE = "https://drive.google.com/thumbnail?id=1poseI903UQVoSMTAvNZBtjLnBUFsryeJ&sz=w200";
+function LogoImg({ local, drive, alt }: { local: string; drive: string; alt: string }) {
+  const [stage, setStage] = useState(0);
+  if (stage === 2) return <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>;
+  const src = stage === 0 ? local : drive;
+  return <img src={src} alt={alt} width={140} height={40} className="h-10 w-auto" onError={() => setStage((v) => v + 1)} />;
+}
 function Wordmark() {
-  const [failed, setFailed] = useState(false);
   return (<Link to="/" className="flex flex-col leading-none" aria-label="RAWK home">
-    {failed
-      ? <span className="font-serif text-[28px] font-bold tracking-wide text-navy">RAWK</span>
-      : <img src={LOGO_BLACK} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setFailed(true)} />}
-    <span className="text-[11px] font-bold tracking-[0.15em] text-muted" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>We Believe in Quality</span>
+    <LogoImg local="/images/rawk-logo-black.png" drive={LOGO_BLACK} alt="RAWK" />
+    <span className="text-[11px] font-bold tracking-[0.15em] text-muted">We Believe in Quality</span>
   </Link>);
 }
 function FooterWordmark() {
-  const [failed, setFailed] = useState(false);
-  return failed
-    ? <p className="font-serif text-3xl font-bold">RAWK</p>
-    : <img src={LOGO_WHITE} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setFailed(true)} />;
+  const [stage, setStage] = useState(0);
+  if (stage === 2) return <p className="font-serif text-3xl font-bold">RAWK</p>;
+  const src = stage === 0 ? "/images/rawk-logo-white.png" : LOGO_WHITE;
+  return <img src={src} alt="RAWK" width={140} height={40} className="h-10 w-auto" onError={() => setStage((v) => v + 1)} />;
 }
 
 const USE_AREAS = [
@@ -41,6 +48,13 @@ const USE_AREAS = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", onKey); };
+  }, [open]);
   const megaButtonRef = useRef<HTMLButtonElement>(null);
   const closeMega = () => { setMegaOpen(false); megaButtonRef.current?.focus(); };
   return (<header className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur">
@@ -49,7 +63,7 @@ export function Header() {
     </div>
     <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-[30px] lg:px-12">
       <Wordmark />
-      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>☰ Menu</button>
+      <button type="button" className="ml-auto flex min-h-11 items-center gap-2 rounded border border-line bg-white px-3 font-bold text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}><img src="/icons/menu-alt-1.svg" alt="" aria-hidden="true" width={22} height={22} className="h-[22px] w-[22px]" /> Menu</button>
       <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex">
         <div onMouseEnter={() => setMegaOpen(true)} onMouseLeave={() => setMegaOpen(false)} className="relative">
           <button ref={megaButtonRef} type="button" aria-expanded={megaOpen} aria-haspopup="true" onClick={() => setMegaOpen(!megaOpen)} onKeyDown={(e) => { if (e.key === "Escape") closeMega(); }} className="flex min-h-11 items-center gap-1 text-[15px] font-bold text-navy">
@@ -91,12 +105,26 @@ export function Header() {
       </div>
       <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="order-4 hidden lg:inline-flex">WhatsApp Enquiry</RawkButton>
     </div>
-    {open && (<nav id="mobile-menu" aria-label="Mobile" className="border-t border-line bg-white px-4 py-3 lg:hidden">
-      <p className="py-2 text-xs font-semibold uppercase tracking-wide text-muted">Collections</p>
-      {CATEGORIES.map((c) => (<Link key={c.slug} to={`/categories/${c.slug}`} onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy">{c.name}</Link>))}
-      {[["Best Sellers", "/#best-sellers"], ["All products", "/products"], ["About Us", "/about"], ["Bulk Orders", "/bulk-orders"], ["Guides", "/guides"], ["Contact", "/contact"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
-        <Link key={to} to={to} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
-    </nav>)}
+    {open && (
+      <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+        <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="absolute inset-0 h-full w-full bg-black/50" />
+        <div id="mobile-menu" className="drawer-panel absolute right-0 top-0 flex h-full w-[320px] max-w-[85vw] flex-col bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <span onClick={() => setOpen(false)}><Wordmark /></span>
+            <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-line bg-white text-navy transition-colors duration-300 hover:bg-navy hover:text-white"><img src="/icons/cross.svg" alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px]" /></button>
+          </div>
+          <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-3">
+            <p className="py-2 text-xs font-semibold uppercase tracking-wide text-muted">Collections</p>
+            {CATEGORIES.map((c) => (<Link key={c.slug} to={`/categories/${c.slug}`} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy">{c.name}</Link>))}
+            {[["Best Sellers", "/#best-sellers"], ["All products", "/products"], ["About Us", "/about"], ["Bulk Orders", "/bulk-orders"], ["Guides", "/guides"], ["Contact", "/contact"], ["Catalogue", "/catalogue"]].map(([label, to]) => (
+              <Link key={to} to={to} prefetch="intent" onClick={() => setOpen(false)} className="block min-h-11 content-center border-b border-line py-2 font-bold text-navy last:border-0">{label}</Link>))}
+          </nav>
+          <div className="border-t border-line px-4 py-4">
+            <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl("Hello, I would like to enquire about RAWK hardware products.")} target="_blank" className="w-full">WhatsApp Enquiry</RawkButton>
+          </div>
+        </div>
+      </div>
+    )}
   </header>);
 }
 
@@ -150,7 +178,7 @@ export function MobileBar() {
   const { pathname } = useLocation();
   const { message } = useEnquiry();
   const isProduct = pathname.startsWith("/products/");
-  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 lg:hidden">
+  return (<div className="sticky bottom-0 z-[5] flex gap-[10px] border-t border-line bg-white px-4 pb-[env(safe-area-inset-bottom)] pt-2 sm:px-[30px] sm:py-5 lg:hidden">
     <RawkButton variant="whatsapp" whatsappIcon href={whatsappUrl(message)} target="_blank" className="flex-1">{isProduct ? "Enquire about this product" : "WhatsApp"}</RawkButton>
     <RawkButton to="/bulk-orders" className="flex-1">Bulk Quote</RawkButton>
   </div>);

@@ -22,10 +22,12 @@ export const SITE_URL = process.env.SITE_URL ?? "https://rawk-hardware-website.v
  */
 export type Marketplace = { name: string; url: string | null; note: string };
 export const MARKETPLACES: Marketplace[] = [
+  // Marquee order set by the user (2026-10-25): Amazon, Flipkart, JioMart,
+  // Meesho, WhatsApp, Instagram.
   { name: "amazon", url: "https://www.amazon.in/dp/B0GMD2D2JY", note: "Verified D2 listing — the only verified Amazon link" },
   { name: "Flipkart", url: null, note: "Store link to be confirmed" },
-  { name: "meesho", url: null, note: "Store link to be confirmed" },
   { name: "JioMart", url: null, note: "Store link to be confirmed" },
+  { name: "meesho", url: null, note: "Store link to be confirmed" },
   { name: "WhatsApp", url: "https://wa.me/919589133387?text=Hello%2C%20I%20would%20like%20to%20enquire%20about%20RAWK%20hardware%20products.", note: "Verified WhatsApp number 9589133387" },
   { name: "Instagram", url: "https://www.instagram.com/rawk_04", note: "Verified profile @rawk_04" },
 ];
